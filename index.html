@@ -1,0 +1,2920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Family Tree</title>
+  <style>
+    
+.member-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.generation-block {
+  position: relative;
+  width: 100%;
+  text-align: center;
+}
+
+.generation-label {
+  font-weight: 600;
+  margin-bottom: 14px;
+  opacity: 0.8;
+}
+
+.generation-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 20px;
+  position: relative;
+}
+
+.generation-block + .generation-block::before {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: -20px auto 12px;
+  background: #b89555;
+}
+
+.generation-row .member-card {
+  width: 245px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .generation-row .member-card {
+    width: min(100%, 300px);
+  }
+}
+
+    :root {
+      --green:#123b2d; --green-light:#1d5942; --gold:#d8b66a;
+      --cream:#f7f3e8; --white:#fff; --text:#20332b;
+      --muted:#68766e; --danger:#a83c36;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,"Noto Nastaliq Urdu",sans-serif; background:var(--cream); color:var(--text); }
+    button,input,select { font:inherit; }
+    button { border:0; border-radius:8px; padding:11px 16px; cursor:pointer; font-weight:600; }
+    button:disabled { opacity:.6; cursor:wait; }
+    .primary { background:var(--green); color:white; }
+    .secondary { background:#e9e0c9; color:var(--green); }
+    .gold { background:var(--gold); color:#253126; }
+    .danger { background:#f7e3e1; color:var(--danger); }
+    .page { width:min(1100px,94%); margin:auto; }
+    header { background:var(--green); color:white; padding:22px 0; border-bottom:4px solid var(--gold); }
+    .header-row { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+    header h1 { margin:0; font-size:clamp(23px,4vw,34px); }
+    header p { margin:7px 0 0; color:#e9dfc6; }
+    main { padding:28px 0 50px; }
+    .panel { background:var(--white); border-radius:14px; padding:clamp(18px,4vw,30px); margin-bottom:22px; box-shadow:0 5px 20px #18392a0d; border:1px solid #e9e3d5; }
+   
+
+.welcome {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: center;
+  padding: clamp(35px, 6vw, 70px) 22px;
+  color: #fff;
+  
+background: linear-gradient(
+  135deg,
+  rgba(7, 21, 46, 0.78),
+  rgba(16, 41, 75, 0.70),
+  rgba(8, 23, 47, 0.78)
+);
+backdrop-filter: blur(2px);
+-webkit-backdrop-filter: blur(2px);
+
+
+  border: 1px solid rgba(217, 189, 122, .85);
+  border-radius: 24px;
+  box-shadow: 0 18px 55px rgba(5, 17, 38, .28);
+  animation: welcomeEntrance 1s ease both;
+}
+
+.welcome-glow {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  width: 230px;
+  height: 230px;
+  left: var(--mouse-x);
+  top: var(--mouse-y);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(217, 189, 122, .19), rgba(80, 155, 230, .08) 35%, transparent 70%);
+  filter: blur(8px);
+  transition: left .12s ease-out, top .12s ease-out;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  max-width: 850px;
+  margin: auto;
+}
+
+.welcome-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #e8cb88;
+  letter-spacing: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.welcome-eyebrow span,
+.welcome-divider span {
+  display: inline-block;
+  width: 45px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d9bd7a);
+}
+
+.welcome-eyebrow span:last-child {
+  transform: rotate(180deg);
+}
+
+.welcome-tree {
+  width: 112px;
+  margin: 24px auto 12px;
+  animation: treeFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(217, 189, 122, .24));
+}
+
+.welcome-tree svg {
+  display: block;
+  width: 100%;
+}
+
+.welcome-kicker {
+  margin: 10px 0 !important;
+  color: #b9d8f5 !important;
+  font-size: 10px !important;
+  letter-spacing: 3px;
+}
+
+.welcome h2 {
+  margin: 8px 0 12px;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.15;
+  letter-spacing: .5px;
+}
+
+.welcome h2 span {
+  color: #e6c77e;
+  text-shadow: 0 0 22px rgba(217, 189, 122, .18);
+}
+
+.welcome .welcome-subtitle {
+  margin: 0 auto 16px;
+  color: #b9d8f5;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(17px, 3vw, 25px);
+  letter-spacing: 1px;
+}
+
+.welcome-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px auto;
+  color: #e6c77e;
+  font-size: 11px;
+}
+
+.welcome-divider span {
+  width: 70px;
+}
+
+.welcome #welcomeText {
+  max-width: 570px;
+  margin: 0 auto 28px;
+  color: #dce8f7;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.welcome .welcome-explore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  padding: 15px 27px;
+  border: 1px solid #f0d58f;
+  border-radius: 50px;
+  color: #10213b;
+  background: linear-gradient(135deg, #f4dfa7, #d9bd7a, #f0d99c);
+  box-shadow: 0 0 0 4px rgba(217, 189, 122, .08);
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+
+.welcome .welcome-explore {
+  color: #10213b;
+background: linear-gradient(135deg, #f4dfa7, #d9bd7a, #f0d99c);
+border: 1px solid #f0d58f;
+}
+
+
+.welcome .welcome-explore:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 5px 18px rgba(217, 189, 122, 0.28);
+}
+
+
+.welcome-arrow {
+  font-size: 21px;
+  transition: transform .25s ease;
+}
+
+.welcome .welcome-explore:hover .welcome-arrow {
+  transform: translateX(5px);
+}
+
+.welcome-button-icon {
+  font-size: 22px;
+}
+
+.welcome-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 32px;
+  color: #c9dcf2;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.welcome-footer i {
+  color: #d9bd7a;
+  font-size: 8px;
+  font-style: normal;
+}
+
+@keyframes welcomeEntrance {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes treeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome, .welcome-tree {
+    animation: none;
+  }
+  .welcome-glow {
+    transition: none;
+  }
+}
+
+    h2,h3 { color:var(--green); }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row>button { flex:0 0 auto; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .field { display:flex; flex-direction:column; gap:7px; }
+    .field.full { grid-column:1/-1; }
+    label { font-weight:600; font-size:14px; }
+    input,select { width:100%; padding:12px; border:1px solid #d7d9d0; border-radius:8px; background:white; color:var(--text); }
+    input:focus,select:focus { outline:2px solid #d8b66a88; border-color:var(--gold); }
+    .status { margin-top:14px; line-height:1.6; overflow-wrap:anywhere; }
+    .muted { color:var(--muted); line-height:1.7; }
+    .hidden { display:none!important; }
+
+/* Family tree layout */
+.family-tree {
+  width: 100%;
+  overflow-x: auto;
+  padding: 24px 12px 36px;
+}
+
+.generation-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  min-width: max-content;
+  padding: 10px 12px;
+}
+
+.generation-label {
+  text-align: center;
+  color: #68766e;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.generation-connector {
+  height: 36px;
+  width: 2px;
+  background: #d8b66a;
+  margin: 0 auto;
+}
+
+.family-tree .member-card {
+  width: 245px;
+  flex: 0 0 245px;
+  position: relative;
+  box-shadow: 0 5px 16px #18392a12;
+}
+
+.family-tree .member-photo,
+.family-tree .photo-placeholder {
+  height: 190px;
+}
+
+@media (max-width: 620px) {
+  .generation-row {
+    justify-content: flex-start;
+    gap: 14px;
+  }
+}
+
+    .member-card {
+  background: #fffdf8;
+  border: 1px solid #c4a66a;
+  border-top: 4px solid var(--gold);
+  border-radius: 16px;
+  padding: 18px;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(23, 54, 83, 0.10);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.member-card:hover {
+  box-shadow: 0 10px 25px rgba(23, 54, 83, 0.16);
+  transform: translateY(-2px);
+}
+    .member-card h3 { margin:0 0 7px; overflow-wrap:anywhere; }
+.member-photo {
+  width: 100%;
+  max-width: 160px;
+  height: 190px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid #c4a66a;
+  border-radius: 14px;
+  background: #eaf3fb;
+  margin: 0 auto 14px;
+}
+    .photo-placeholder { width:100%; height:230px; border-radius:9px; background:#eee9dc; color:#68766e; display:flex; align-items:center; justify-content:center; text-align:center; margin-bottom:14px; padding:15px; }
+    .urdu-name { font-size:20px; direction:rtl; text-align:left; margin:0 0 12px; }
+    .member-details { font-size:14px; line-height:1.8; color:#526158; overflow-wrap:anywhere; }
+    .member-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:15px; }
+    .member-actions button { padding:9px 12px; font-size:13px; }
+    .section-title { display:flex; justify-content:space-between; gap:14px; align-items:center; flex-wrap:wrap; }
+    .section-title h2 { margin:0; }
+    .small { font-size:13px; color:var(--muted); }
+    .photo-preview {
+  max-width: 180px;
+  max-height: 180px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+    footer { text-align:center; padding:22px; background:var(--green); color:#eee4cd; }
+    @media(max-width:620px) { .form-grid { grid-template-columns:1fr; } .field.full { grid-column:auto; } .header-row { align-items:flex-start; } }
+  
+/* Family member status badges */
+.member-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 8px auto 12px;
+  padding: 6px 15px;
+  border: 1px solid #c4a66a;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+/* Alive: light blue and navy */
+.member-status.status-alive {
+  color: #173653;
+  background: #e5f1fa;
+  border-color: #8db9d5;
+}
+
+/* Deceased: soft gold and navy */
+.member-status.status-deceased {
+  color: #243447;
+  background: #f7f0df;
+  border-color: #c4a66a;
+}
+
+/* Center Urdu name below the status badge */
+.member-card .urdu-name {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  direction: rtl;
+  margin: 6px auto 12px;
+  line-height: 1.8;
+}
+
+/* ===== PREMIUM LOGIN DESIGN ===== */
+.login-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-width: 650px;
+  margin: 28px auto;
+  padding: clamp(24px, 5vw, 48px);
+  color: #fff;
+  background: linear-gradient(135deg, #07152e, #10294b 55%, #08172f);
+  border: 1px solid rgba(217, 189, 122, .75);
+  border-radius: 24px;
+  box-shadow: 0 18px 55px rgba(5, 17, 38, .28);
+  animation: loginEntrance .65s ease both;
+}
+
+.login-panel::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 240px;
+  height: 240px;
+  top: -130px;
+  right: -80px;
+  border-radius: 50%;
+  background: rgba(80, 155, 230, .12);
+  filter: blur(35px);
+  pointer-events: none;
+}
+
+.login-content {
+  position: relative;
+  max-width: 480px;
+  margin: auto;
+}
+
+.login-emblem {
+  width: 84px;
+  margin: 0 auto 16px;
+  animation: loginFloat 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(217, 189, 122, .2));
+}
+
+.login-emblem svg {
+  display: block;
+  width: 100%;
+}
+
+.login-eyebrow {
+  margin: 0 0 12px;
+  color: #e8cb88;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  line-height: 1.8;
+}
+
+.login-panel h2 {
+  margin: 8px 0 12px;
+  color: #fff;
+  text-align: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(27px, 4vw, 36px);
+  line-height: 1.25;
+}
+
+.login-panel .login-description {
+  max-width: 400px;
+  margin: 0 auto;
+  color: #c7d9ef;
+  text-align: center;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: #d9bd7a;
+  font-size: 10px;
+}
+
+.login-divider span {
+  width: 65px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d9bd7a);
+}
+
+.login-divider span:last-child {
+  transform: rotate(180deg);
+}
+
+.login-panel .field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #e1eaf6;
+  font-size: 13px;
+}
+
+.login-panel .field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 47px;
+  padding: 12px 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, .055);
+  border: 1px solid rgba(185, 216, 245, .28);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+
+.login-panel .field input:focus {
+  border-color: #d9bd7a;
+  box-shadow: 0 0 0 3px rgba(217, 189, 122, .12);
+}
+
+.login-panel .field input:focus-visible {
+  outline: 1px solid #d9bd7a;
+  outline-offset: 2px;
+}
+
+.login-panel .login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.login-panel .login-actions button {
+  min-height: 46px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+.login-panel .login-submit {
+  flex: 1 1 180px;
+  color: #10213b;
+  background: linear-gradient(135deg, #f4dfa7, #d9bd7a, #f0d99c);
+  border: 1px solid #f0d58f;
+  font-weight: 700;
+}
+
+.login-panel .login-back {
+  flex: 0 0 auto;
+  padding: 10px 23px;
+  color: #e6effb;
+  background: rgba(185, 216, 245, .08);
+  border: 1px solid rgba(185, 216, 245, .35);
+}
+
+.login-panel .login-actions button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 18px rgba(217, 189, 122, .22);
+}
+
+.login-panel .login-back:hover {
+  box-shadow: 0 5px 18px rgba(185, 216, 245, .12);
+}
+
+.login-panel #loginStatus {
+  margin-top: 12px;
+  color: #dce8f7;
+  line-height: 1.6;
+}
+
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 26px;
+  color: #b9d8f5;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+.login-footer-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: #d9bd7a;
+  box-shadow: 0 0 9px rgba(217, 189, 122, .5);
+}
+
+@keyframes loginEntrance {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loginFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (max-width: 480px) {
+  .login-panel {
+    padding: 25px 18px;
+    border-radius: 18px;
+  }
+
+  .login-panel .login-back {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-panel,
+  .login-emblem {
+    animation: none;
+  }
+
+  .login-panel .login-actions button,
+  .login-panel .field input {
+    transition: none;
+  }
+}
+
+/* ===== MATCHING HEADER AND FOOTER THEME ===== */
+header {
+  color: #ffffff;
+  background: linear-gradient(135deg, #07152e, #10294b 55%, #08172f);
+  border-bottom: 1px solid rgba(217, 189, 122, .65);
+}
+
+footer {
+  color: #dce8f7;
+  background: linear-gradient(135deg, #07152e, #10294b 55%, #08172f);
+  border-top: 1px solid rgba(217, 189, 122, .65);
+}
+
+header a,
+footer a {
+  color: #b9d8f5;
+}
+
+header a:hover,
+footer a:hover {
+  color: #e6c77e;
+}
+
+/* ===== SHARED ANIMATED FAMILY TREE BACKGROUND ===== */
+body {
+  position: relative;
+  isolation: isolate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 45%,
+      rgba(50, 106, 161, .20), transparent 60%),
+    linear-gradient(135deg, #07152e, #0b1d38 55%, #08152b);
+}
+
+/* Soft, shining tree watermark */
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+}
+ 
+.shared-family-tree {
+  position: fixed;
+  z-index: 0;
+  width: min(72vw, 540px);
+  height: min(85vh, 650px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: .30;
+  animation: elegantTreeGlow 6s ease-in-out infinite;
+}
+
+.shared-family-tree svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes elegantTreeGlow {
+  0%, 100% {
+    opacity: .20;
+    filter: drop-shadow(0 0 4px rgba(217, 189, 122, .12));
+  }
+  50% {
+    opacity: .42;
+    filter: drop-shadow(0 0 13px rgba(217, 189, 122, .32));
+  }
+}
+
+@media (max-width: 600px) {
+  .shared-family-tree {
+    width: 95vw;
+    opacity: .20;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shared-family-tree {
+    animation: none;
+  }
+}
+
+/* ===== FAMILY DASHBOARD: MATCHING THEME ===== */
+
+/* Main content cards and panels */
+.panel,
+.card,
+.dashboard-card,
+.stat-card,
+.member-card,
+.profile-card,
+.tab-content {
+  color: #e6effb;
+  background: linear-gradient(
+    135deg,
+    rgba(7, 21, 46, .88),
+    rgba(16, 41, 75, .82),
+    rgba(8, 23, 47, .88)
+  );
+  border: 1px solid rgba(217, 189, 122, .38);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(3, 13, 30, .16);
+}
+
+/* Headings inside dashboard cards */
+.panel h2,
+.panel h3,
+.card h2,
+.card h3,
+.dashboard-card h2,
+.dashboard-card h3 {
+  color: #f0d99c;
+}
+
+/* Labels and supporting text */
+.panel label,
+.card label,
+.dashboard-card label,
+.profile-card label {
+  color: #dce8f7;
+}
+
+/* Inputs and text areas */
+.panel input,
+.panel select,
+.panel textarea,
+.card input,
+.card select,
+.card textarea {
+  color: #ffffff;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(185, 216, 245, .30);
+  border-radius: 8px;
+}
+
+.panel input:focus,
+.panel select:focus,
+.panel textarea:focus,
+.card input:focus,
+.card select:focus,
+.card textarea:focus {
+  outline: none;
+  border-color: #d9bd7a;
+  box-shadow: 0 0 0 3px rgba(217, 189, 122, .10);
+}
+
+/* Tabs */
+.tab,
+.tab-button,
+nav button {
+  transition: background .2s ease, color .2s ease,
+              border-color .2s ease;
+}
+
+.tab:hover,
+.tab-button:hover,
+nav button:hover {
+  color: #f0d99c;
+  border-color: rgba(217, 189, 122, .55);
+}
+
+/* Gold hover effect for dashboard buttons */
+.panel button,
+.card button,
+.dashboard-card button {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.panel button:hover,
+.card button:hover,
+.dashboard-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(217, 189, 122, .16);
+}
+  
+/* ===== GLOBAL TRANSPARENT THEME ===== */
+
+/* Welcome page */
+#welcome.welcome {
+  background: linear-gradient(
+    135deg,
+    rgba(7, 21, 46, .48),
+    rgba(16, 41, 75, .42),
+    rgba(8, 23, 47, .48)
+  );
+}
+
+/* Login page */
+#login.login-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(7, 21, 46, .48),
+    rgba(16, 41, 75, .42),
+    rgba(8, 23, 47, .48)
+  );
+}
+
+/* Dashboard panels, tabs and member cards */
+.panel,
+.card,
+.dashboard-card,
+.stat-card,
+.member-card,
+.profile-card,
+.tab-content {
+  background: linear-gradient(
+    135deg,
+    rgba(7, 21, 46, .48),
+    rgba(16, 41, 75, .42),
+    rgba(8, 23, 47, .48)
+  );
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+/* Keep member photos fully visible */
+.member-card img,
+.profile-card img,
+img.member-photo {
+  opacity: 1;
+  filter: none;
+}
+
+/* FAMILY STATISTICS DASHBOARD */
+.statistics-panel {
+  margin: 22px 0;
+  padding: 24px;
+  border: 1px solid rgba(217, 189, 122, 0.55);
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(7, 21, 46, 0.58),
+    rgba(16, 41, 75, 0.52),
+    rgba(8, 23, 47, 0.58)
+  );
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.statistics-panel .section-title {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.statistics-panel .section-title h2 {
+  color: #f4e5b7;
+  margin-bottom: 6px;
+}
+
+.statistics-panel .section-title p {
+  color: #b9d8f5;
+  margin-top: 0;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statistics-card {
+  min-width: 0;
+  padding: 20px 12px;
+  text-align: center;
+  border: 1px solid rgba(217, 189, 122, 0.42);
+  border-radius: 14px;
+  background: rgba(16, 41, 75, 0.65);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.statistics-card:hover {
+  transform: translateY(-3px);
+  border-color: #d9bd7a;
+}
+
+.statistics-icon {
+  display: block;
+  color: #d9bd7a;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.statistics-card h3 {
+  color: #dce8f7;
+  font-size: 14px;
+  margin: 6px 0 12px;
+}
+
+.statistics-card p {
+  color: #f4e5b7;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.statistics-subtitle {
+  color: #f4e5b7;
+  margin: 26px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(217, 189, 122, 0.35);
+}
+
+.generation-stat-row {
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(185, 216, 245, 0.22);
+  background: rgba(16, 41, 75, 0.55);
+}
+
+.generation-stat-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #f4e5b7;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.generation-stat-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: #dce8f7;
+  font-size: 13px;
+}
+
+.generation-stat-details .alive-count {
+  color: #b9e4ca;
+}
+
+.generation-stat-details .deceased-count {
+  color: #f0c4bd;
+}
+
+.generation-stat-bar {
+  display: flex;
+  overflow: hidden;
+  height: 8px;
+  margin-top: 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.generation-stat-bar .alive-bar {
+  height: 100%;
+  background: #8fc9a5;
+}
+
+.generation-stat-bar .deceased-bar {
+  height: 100%;
+  background: #d9bd7a;
+}
+
+@media (max-width: 700px) {
+  .statistics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statistics-panel {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statistics-card {
+    transition: none;
+  }
+
+  .statistics-card:hover {
+    transform: none;
+  }
+}
+/* END FAMILY STATISTICS DASHBOARD */
+
+/* Navy blue dropdown theme */
+select,
+select option,
+select optgroup {
+  color: #f4e5b7;
+  background-color: #10294b;
+}
+
+select {
+  border: 1px solid #d9bd7a;
+  border-radius: 8px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #f4e5b7;
+  box-shadow: 0 0 0 2px rgba(217, 189, 122, 0.2);
+}
+
+select option:checked {
+  color: #10213b;
+  background-color: #d9bd7a;
+}
+
+select option:disabled {
+  color: #9fb3cc;
+}
+
+/* Individual family member print layout */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #profilePanel,
+  #profilePanel * {
+    visibility: visible !important;
+  }
+
+  #profilePanel {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #17243a !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  #profilePanel .section-title,
+  #profilePanel .profile-details {
+    color: #17243a !important;
+  }
+
+  #profilePanel h2,
+  #profilePanel h3 {
+    color: #10294b !important;
+    break-after: avoid;
+  }
+
+  #profilePanel p,
+  #profilePanel li {
+    color: #17243a !important;
+    overflow-wrap: anywhere;
+  }
+
+  #backToTreeBtn,
+  #printProfileBtn {
+    display: none !important;
+  }
+
+  #profilePhoto {
+    display: block !important;
+    visibility: visible !important;
+    width: 110px !important;
+    height: 130px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+  }
+
+  #profilePanel h3 {
+    margin-top: 18px;
+    border-bottom: 1px solid #d9bd7a;
+    padding-bottom: 5px;
+  }
+
+  #profilePanel .profile-details {
+    break-inside: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  
+<div class="shared-family-tree" aria-hidden="true">
+  <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="treeGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#F5E2AC"/>
+        <stop offset="50%" stop-color="#D9BD7A"/>
+        <stop offset="100%" stop-color="#A98545"/>
+      </linearGradient>
+      <radialGradient id="treeLight">
+        <stop offset="0%" stop-color="#D9BD7A" stop-opacity=".3"/>
+        <stop offset="100%" stop-color="#D9BD7A" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <circle cx="250" cy="290" r="210" fill="url(#treeLight)"/>
+
+    <g fill="none" stroke="url(#treeGold)"
+       stroke-linecap="round" stroke-linejoin="round">
+      <path d="M250 535 C246 450 260 380 250 300
+               C240 230 250 165 250 105"
+            stroke-width="7"/>
+      <path d="M250 400 C205 365 165 320 135 260
+               M252 350 C300 315 335 270 360 220
+               M250 290 C210 260 185 215 175 175
+               M251 235 C280 205 300 170 310 130
+               M230 440 C190 420 155 390 125 350
+               M260 430 C305 400 345 370 375 330"
+            stroke-width="4"/>
+      <path d="M135 260 L105 235 M135 260 L145 220
+               M175 175 L150 145 M175 175 L195 145
+               M360 220 L385 190 M360 220 L350 180
+               M310 130 L290 105 M310 130 L335 110
+               M125 350 L95 330 M125 350 L130 320
+               M375 330 L400 305 M375 330 L370 300"
+            stroke-width="2.5"/>
+    </g>
+
+    <g fill="url(#treeGold)">
+      <ellipse cx="105" cy="225" rx="9" ry="17"
+               transform="rotate(-38 105 225)"/>
+      <ellipse cx="145" cy="213" rx="8" ry="16"
+               transform="rotate(25 145 213)"/>
+      <ellipse cx="150" cy="138" rx="8" ry="15"
+               transform="rotate(-35 150 138)"/>
+      <ellipse cx="198" cy="138" rx="8" ry="15"
+               transform="rotate(35 198 138)"/>
+      <ellipse cx="385" cy="184" rx="9" ry="16"
+               transform="rotate(40 385 184)"/>
+      <ellipse cx="350" cy="172" rx="8" ry="15"
+               transform="rotate(-25 350 172)"/>
+      <ellipse cx="288" cy="99" rx="8" ry="15"
+               transform="rotate(-35 288 99)"/>
+      <ellipse cx="337" cy="104" rx="8" ry="15"
+               transform="rotate(40 337 104)"/>
+      <ellipse cx="95" cy="325" rx="8" ry="15"
+               transform="rotate(-35 95 325)"/>
+      <ellipse cx="130" cy="315" rx="8" ry="15"
+               transform="rotate(25 130 315)"/>
+      <ellipse cx="402" cy="300" rx="8" ry="15"
+               transform="rotate(40 402 300)"/>
+      <ellipse cx="370" cy="294" rx="8" ry="15"
+               transform="rotate(-25 370 294)"/>
+      <circle cx="250" cy="105" r="5"/>
+      <circle cx="135" cy="260" r="4"/>
+      <circle cx="360" cy="220" r="4"/>
+    </g>
+  </svg>
+</div>
+
+  <header>
+    <div class="page header-row">
+      <div><h1 id="siteTitle">Our Family Tree</h1><p id="siteSubtitle">Preserving our roots, stories and generations</p></div>
+      <button class="gold" id="languageBtn" type="button" onclick="toggleLanguage()">اردو</button>
+    </div>
+  </header>
+  <main class="page">
+    
+<section id="welcome" class="welcome">
+  <div class="welcome-glow" aria-hidden="true"></div>
+
+  <div class="welcome-content">
+    <div class="welcome-eyebrow">
+      <span></span> OUR FAMILY · OUR LEGACY <span></span>
+    </div>
+
+    <div class="welcome-tree" aria-hidden="true">
+      <svg viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="53" stroke="#D9BD7A" stroke-opacity=".55"/>
+        <g stroke="#D9BD7A" stroke-width="2.4" stroke-linecap="round">
+          <path d="M60 91V52M60 72L43 55M60 65L78 47M60 54L60 37M60 81L76 66M60 81L45 70"/>
+        </g>
+        <g fill="#D9BD7A">
+          <ellipse cx="43" cy="51" rx="6" ry="9" transform="rotate(-40 43 51)"/>
+          <ellipse cx="78" cy="43" rx="6" ry="9" transform="rotate(40 78 43)"/>
+          <ellipse cx="60" cy="33" rx="6" ry="9"/>
+          <ellipse cx="76" cy="62" rx="6" ry="9" transform="rotate(45 76 62)"/>
+          <ellipse cx="42" cy="66" rx="6" ry="9" transform="rotate(-45 42 66)"/>
+          <circle cx="60" cy="49" r="5"/>
+        </g>
+        <g stroke="#B9D8F5" stroke-width="1.5" stroke-linecap="round">
+          <path d="M60 91L48 101M60 91L70 101M60 91L60 105"/>
+        </g>
+      </svg>
+    </div>
+
+    <p class="welcome-kicker">A LEGACY THROUGH GENERATIONS</p>
+
+    <h2 id="welcomeTitle">
+      Khandani <span>Shajra</span>
+    </h2>
+
+    <p class="welcome-subtitle">Our Roots, Our Generations</p>
+
+    <div class="welcome-divider">
+      <span></span> ◆ <span></span>
+    </div>
+
+    <p id="welcomeText">
+      Every name holds a memory. Every connection tells a story.
+      Discover your roots and preserve your family's legacy for generations to come.
+    </p>
+
+    <button class="gold welcome-explore"
+            id="exploreBtn"
+            type="button"
+            onclick="showLogin()">
+      <span class="welcome-button-icon">✧</span>
+      Explore Our Roots
+      <span class="welcome-arrow">→</span>
+    </button>
+
+    <div class="welcome-footer">
+      <span>FAMILY</span><i>◆</i>
+      <span>HERITAGE</span><i>◆</i>
+      <span>LEGACY</span>
+    </div>
+  </div>
+</section>
+
+
+    
+<section id="login" class="panel hidden login-panel">
+  <div class="login-content">
+
+    <div class="login-emblem" aria-hidden="true">
+      <svg viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="35" stroke="#D9BD7A" stroke-opacity=".6"/>
+        <path d="M27 35V27a13 13 0 0 1 26 0v8"
+          stroke="#D9BD7A" stroke-width="3" stroke-linecap="round"/>
+        <rect x="22" y="34" width="36" height="27" rx="6"
+          stroke="#D9BD7A" stroke-width="2.5"/>
+        <circle cx="40" cy="45" r="3" fill="#B9D8F5"/>
+        <path d="M40 48v5" stroke="#B9D8F5" stroke-width="2.5"
+          stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <p class="login-eyebrow">FAMILY HERITAGE · PRIVATE ACCESS</p>
+
+    <h2 id="loginTitle">Administrator Login</h2>
+
+    <p class="muted login-description" id="loginHelp">
+      Sign in using the administrator account created in Supabase.
+    </p>
+
+    <div class="login-divider"><span></span> ◆ <span></span></div>
+
+    <form id="loginForm">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="loginEmail" id="emailLabel">Email address</label>
+          <input id="loginEmail" type="email"
+            autocomplete="username" required>
+        </div>
+
+        <div class="field full">
+          <label for="loginPassword" id="passwordLabel">Password</label>
+          <input id="loginPassword" type="password"
+            autocomplete="current-password" required>
+        </div>
+      </div>
+
+      <div class="row login-actions" style="margin-top:22px">
+        <button class="primary login-submit" id="loginBtn" type="submit">
+          <span>Login Securely</span><span aria-hidden="true"> →</span>
+        </button>
+        <button class="secondary login-back" id="backBtn"
+          type="button" onclick="showWelcome()">Back</button>
+      </div>
+
+      <div id="loginStatus" class="status" role="status"></div>
+    </form>
+
+    <div class="login-footer">
+      <span class="login-footer-dot"></span>
+      AUTHORIZED FAMILY ADMINISTRATOR ONLY
+    </div>
+  </div>
+</section>
+
+
+    <section id="dashboard" class="hidden">
+      <div class="panel">
+        <div class="section-title">
+          <div><h2 id="dashboardTitle">Family Dashboard</h2><p class="muted" id="dashboardHelp">Add family members or edit existing records.</p></div>
+          <div class="row">
+            <button class="primary" id="addPersonBtn" type="button" onclick="startAddMember()">+ Add Family Member</button>
+            <button class="secondary" id="refreshBtn" type="button" onclick="loadMembers()">Refresh Tree</button>
+            <button class="danger" id="logoutBtn" type="button" onclick="logOut()">Logout</button>
+          </div>
+        </div>
+        <div id="dashboardStatus" class="status" role="status"></div>
+      </div>
+
+      <section id="addPanel" class="panel hidden">
+        <h2 id="formTitle">Add Family Member</h2>
+        <p class="muted" id="formHelp">Enter the person's details below. Fields marked with * are required.</p>
+        <form id="memberForm">
+          <div class="form-grid">
+            <div class="field"><label for="fullName" id="fullNameLabel">Full name *</label><input id="fullName" type="text" maxlength="200" required></div>
+            <div class="field"><label for="urduName" id="urduNameLabel">Urdu name</label><input id="urduName" type="text" maxlength="200" dir="auto"></div>
+            <div class="field"><label for="gender" id="genderLabel">Gender</label><select id="gender"><option value="">Select gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+            <div class="field"><label for="birthDate" id="birthDateLabel">Date of birth</label><input id="birthDate" type="date"></div>
+            <div class="field">
+  <label for="deathDate" id="deathDateLabel">Date of death</label>
+  <input id="deathDate" type="date">
+</div>
+
+<div class="field">
+  <label for="father" id="fatherLabel">Father</label>
+  <select id="father">
+    <option value="">Not selected</option>
+  </select>
+</div>
+
+<div class="field">
+  <label for="mother" id="motherLabel">Mother</label>
+  <select id="mother">
+    <option value="">Not selected</option>
+  </select>
+</div>
+
+<div class="field">
+  <label for="fatherNameText">Father's Name (Additional)</label>
+  <input id="fatherNameText" type="text" maxlength="200">
+</div>
+
+<div class="field">
+  <label for="motherNameText">Mother's Name (Additional)</label>
+  <input id="motherNameText" type="text" maxlength="200">
+</div>
+
+<div class="field">
+  <label for="education">Education / Taleem</label>
+  <input id="education" type="text" maxlength="300">
+</div>
+<div class="field">
+  <label for="cnicNumber">CNIC Number (13 digits)</label>
+  <input
+    id="cnicNumber"
+    type="text"
+    inputmode="numeric"
+    maxlength="13"
+    pattern="[0-9]{13}"
+    placeholder="3520112345671"
+    autocomplete="off"
+  >
+</div>
+<div class="field">
+  <label for="occupation">Occupation / Pesha</label>
+  <input id="occupation" type="text" maxlength="300">
+</div>
+
+<div class="field">
+  <label for="spouseName">Spouse Name</label>
+  <input id="spouseName" type="text" maxlength="200">
+</div>
+
+<div class="field">
+  <label for="marriageDate">Marriage Date</label>
+  <input id="marriageDate" type="date">
+</div>
+
+<div class="field full">
+  <label for="biography">Biography / Zindagi ki kahani</label>
+  <textarea id="biography" rows="5" maxlength="10000"></textarea>
+</div>
+              <label for="memberPhoto" id="photoLabel">Family member photo (JPG, PNG or WebP; max 5 MB)</label>
+              <input id="memberPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+              <p class="small" id="photoHelp">Optional. If editing, leave this empty to keep the current photo.</p>
+              <img id="photoPreview" class="photo-preview hidden" alt="Selected photo preview">
+            </div>
+          </div>
+          <div class="row" style="margin-top:22px">
+            <button class="primary" id="saveMemberBtn" type="submit">Save Family Member</button>
+            <button class="secondary" id="cancelFormBtn" type="button" onclick="hideAddForm()">Cancel</button>
+          </div>
+          <div id="formStatus" class="status" role="status"></div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="section-title"><h2 id="membersTitle">Family Members</h2><span class="small" id="memberCount">0 members</span></div>
+        <p class="muted" id="membersHelp">Use the Edit button on a person's card to update their details.</p>
+        
+<div class="row" style="margin-bottom:16px; align-items:center;">
+  <button
+    type="button"
+    id="familyBackBtn"
+    class="secondary hidden">
+    ← Back to Previous Family
+  </button>
+
+  <h3 id="familyViewTitle" style="margin:0;">
+    Main Family
+  </h3>
+</div>
+
+<!-- FAMILY STATISTICS DASHBOARD -->
+<section id="familyStatistics" class="panel statistics-panel">
+  <div class="section-title">
+    <h2>Family Statistics</h2>
+    <p class="muted">Our Family · Our Generations</p>
+  </div>
+
+  <div class="statistics-grid">
+    <article class="statistics-card">
+      <span class="statistics-icon">♧</span>
+      <h3>Total Members</h3>
+      <p id="statsTotal">0</p>
+    </article>
+
+    <article class="statistics-card">
+      <span class="statistics-icon">♡</span>
+      <h3>Alive Members</h3>
+      <p id="statsAlive">0</p>
+    </article>
+
+    <article class="statistics-card">
+      <span class="statistics-icon">✦</span>
+      <h3>Deceased Members</h3>
+      <p id="statsDeceased">0</p>
+    </article>
+
+    <article class="statistics-card">
+      <span class="statistics-icon">⌘</span>
+      <h3>Generations</h3>
+      <p id="statsGenerations">0</p>
+    </article>
+  </div>
+
+  <h3 class="statistics-subtitle">Generation-wise Record</h3>
+  <div id="generationStatistics"></div>
+</section>
+<!-- END FAMILY STATISTICS DASHBOARD -->
+
+        <div id="treeContent" class="family-tree"></div>
+      </section>
+      
+<section id="profilePanel" class="panel hidden">
+  <button type="button" class="secondary" id="backToTreeBtn">
+    ← Back to Family Tree
+  </button>
+
+<button type="button" class="gold" id="printProfileBtn"
+        onclick="printMemberProfile()">
+  🖨 Print Profile / PDF
+</button>
+
+  <div class="section-title">
+    <h2 id="profileName">Family Member Profile</h2>
+  </div>
+
+  <div class="profile-header">
+    <img id="profilePhoto" class="member-photo hidden" alt="Family member photo">
+    <p id="profileUrduName" class="urdu-name"></p>
+    <p id="profileStatus" class="member-status"></p>
+  </div>
+
+  <div class="profile-details">
+    <h3>Personal Information</h3>
+    <p><strong>CNIC Number:</strong> <span id="profileCnic"></span></p>
+    <p><strong>Gender:</strong> <span id="profileGender"></span></p>
+    <p><strong>Date of Birth:</strong> <span id="profileBirthDate"></span></p>
+    <p><strong>Date of Death:</strong> <span id="profileDeathDate"></span></p>
+    <p><strong>Education:</strong> <span id="profileEducation"></span></p>
+    <p><strong>Occupation:</strong> <span id="profileOccupation"></span></p>
+    <p><strong>Spouse:</strong> <span id="profileSpouse"></span></p>
+    <p><strong>Marriage Date:</strong> <span id="profileMarriageDate"></span></p>
+
+<h3>Family Relationships</h3>
+<p><strong>Father:</strong> <span id="profileFather"></span></p>
+<p><strong>Mother:</strong> <span id="profileMother"></span></p>
+<p><strong>Father's Name (Additional):</strong> <span id="profileFatherText"></span></p>
+<p><strong>Mother's Name (Additional):</strong> <span id="profileMotherText"></span></p>
+    <p><strong>Children:</strong></p>
+    <ul id="profileChildren"></ul>
+
+    <h3>Biography</h3>
+    <p id="profileBiography"></p>
+  </div>
+</section>
+
+    </section>
+  </main>
+  <footer><span id="footerText">Our Family Tree · Preserving our heritage</span></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+    let members = [];
+    let editingMemberId = null;
+    let currentFamilyMemberId = null;
+    let familyNavigationHistory = [];
+    let isUrdu = false;
+    let previewObjectUrl = null;
+    const el = id => document.getElementById(id);
+
+    const text = {
+      en: {
+        siteTitle:"Our Family Tree",siteSubtitle:"Preserving our roots, stories and generations",
+        welcomeTitle:"Every Family Has a Story",welcomeText:"Discover your family roots and preserve the names and connections of the generations that came before you.",
+        exploreBtn:"Explore Our Roots",loginTitle:"Administrator Login",loginHelp:"Sign in using the administrator account created in Supabase.",
+        emailLabel:"Email address",passwordLabel:"Password",loginBtn:"Login",backBtn:"Back",
+        dashboardTitle:"Family Dashboard",dashboardHelp:"Add family members or edit existing records.",
+        addPersonBtn:"+ Add Family Member",refreshBtn:"Refresh Tree",logoutBtn:"Logout",
+        formTitleAdd:"Add Family Member",formTitleEdit:"Edit Family Member",
+        formHelp:"Enter the person's details below. Fields marked with * are required.",
+        fullNameLabel:"Full name *",urduNameLabel:"Urdu name",genderLabel:"Gender",birthDateLabel:"Date of birth",
+        fatherLabel:"Father",motherLabel:"Mother",photoLabel:"Family member photo (JPG, PNG or WebP; max 5 MB)",
+        photoHelp:"Optional. If editing, leave this empty to keep the current photo.",
+        saveBtn:"Save Family Member",updateBtn:"Update Person",cancelBtn:"Cancel",
+        membersTitle:"Family Members",membersHelp:"Use the Edit button on a person's card to update their details.",
+        footerText:"Our Family Tree · Preserving our heritage",editBtn:"Edit",noMembers:"No family members have been added yet.",
+        unknown:"Not provided",father:"Father",mother:"Mother",gender:"Gender",born:"Date of birth",
+        member:"member",members:"members",male:"Male",female:"Female",other:"Other",notSelected:"Not selected",
+        noPhoto:"No photo added",savedPhotoFailed:"Person saved, but photo upload failed. Edit this person and try uploading the photo again."
+      },
+      ur: {
+        siteTitle:"ہمارا خاندانی شجرہ",siteSubtitle:"اپنی جڑوں اور نسلوں کی یاد محفوظ رکھیں",
+        welcomeTitle:"ہر خاندان کی اپنی کہانی ہے",welcomeText:"اپنے خاندان کی جڑوں، ناموں اور نسلوں کے رشتوں کو محفوظ کریں۔",
+        exploreBtn:"شجرہ دیکھیں",loginTitle:"ایڈمن لاگ اِن",loginHelp:"اپنے ایڈمن اکاؤنٹ سے لاگ اِن کریں۔",
+        emailLabel:"ای میل",passwordLabel:"پاس ورڈ",loginBtn:"لاگ اِن",backBtn:"واپس",
+        dashboardTitle:"خاندانی ڈیش بورڈ",dashboardHelp:"نیا فرد شامل کریں یا پہلے سے موجود ریکارڈ میں ترمیم کریں۔",
+        addPersonBtn:"+ فرد شامل کریں",refreshBtn:"شجرہ ریفریش کریں",logoutBtn:"لاگ آؤٹ",
+        formTitleAdd:"خاندان کا فرد شامل کریں",formTitleEdit:"فرد کی معلومات میں ترمیم",
+        formHelp:"فرد کی معلومات درج کریں۔ * والی معلومات ضروری ہیں۔",
+        fullNameLabel:"پورا نام *",urduNameLabel:"اردو نام",genderLabel:"جنس",birthDateLabel:"تاریخ پیدائش",
+        fatherLabel:"والد",motherLabel:"والدہ",photoLabel:"فرد کی تصویر (JPG، PNG یا WebP؛ زیادہ سے زیادہ 5 MB)",
+        photoHelp:"اختیاری۔ ترمیم کرتے وقت موجودہ تصویر برقرار رکھنے کے لیے خالی چھوڑ دیں۔",
+        saveBtn:"فرد محفوظ کریں",updateBtn:"معلومات اپڈیٹ کریں",cancelBtn:"منسوخ کریں",
+        membersTitle:"خاندان کے افراد",membersHelp:"معلومات تبدیل کرنے کے لیے متعلقہ فرد کے کارڈ پر ترمیم دبائیں۔",
+        footerText:"ہمارا خاندانی شجرہ · اپنی وراثت محفوظ رکھیں",editBtn:"ترمیم",noMembers:"ابھی کوئی فرد شامل نہیں کیا گیا۔",
+        unknown:"درج نہیں",father:"والد",mother:"والدہ",gender:"جنس",born:"تاریخ پیدائش",
+        member:"فرد",members:"افراد",male:"مرد",female:"عورت",other:"دیگر",notSelected:"منتخب نہیں",
+        noPhoto:"تصویر موجود نہیں",savedPhotoFailed:"فرد محفوظ ہوگیا، لیکن تصویر اپ لوڈ نہیں ہوئی۔ ترمیم کرکے دوبارہ کوشش کریں۔"
+      }
+    };
+
+    function t(key) { return text[isUrdu ? "ur" : "en"][key]; }
+    function setText(id,key) { el(id).textContent=t(key); }
+
+    function toggleLanguage() {
+      isUrdu=!isUrdu;
+      document.documentElement.lang=isUrdu?"ur":"en";
+      el("languageBtn").textContent=isUrdu?"English":"اردو";
+      [
+        ["siteTitle","siteTitle"],["siteSubtitle","siteSubtitle"],["welcomeTitle","welcomeTitle"],
+        ["welcomeText","welcomeText"],["exploreBtn","exploreBtn"],["loginTitle","loginTitle"],
+        ["loginHelp","loginHelp"],["emailLabel","emailLabel"],["passwordLabel","passwordLabel"],
+        ["loginBtn","loginBtn"],["backBtn","backBtn"],["dashboardTitle","dashboardTitle"],
+        ["dashboardHelp","dashboardHelp"],["addPersonBtn","addPersonBtn"],["refreshBtn","refreshBtn"],
+        ["logoutBtn","logoutBtn"],["fullNameLabel","fullNameLabel"],["urduNameLabel","urduNameLabel"],
+        ["genderLabel","genderLabel"],["birthDateLabel","birthDateLabel"],["fatherLabel","fatherLabel"],
+        ["motherLabel","motherLabel"],["photoLabel","photoLabel"],["photoHelp","photoHelp"],
+        ["cancelFormBtn","cancelBtn"],["membersTitle","membersTitle"],["membersHelp","membersHelp"],
+        ["footerText","footerText"]
+      ].forEach(([id,key])=>setText(id,key));
+      el("gender").options[0].text=t("notSelected");
+      el("gender").options[1].text=t("male");
+      el("gender").options[2].text=t("female");
+      el("gender").options[3].text=t("other");
+      el("formTitle").textContent=editingMemberId?t("formTitleEdit"):t("formTitleAdd");
+      el("saveMemberBtn").textContent=editingMemberId?t("updateBtn"):t("saveBtn");
+      renderTree();
+    }
+
+    function showOnly(id) {
+      ["welcome","login","dashboard"].forEach(section=>el(section).classList.toggle("hidden",section!==id));
+    }
+    function showWelcome(){showOnly("welcome");}
+    function showLogin(){showOnly("login");el("loginStatus").textContent="";}
+    function showDashboard(){showOnly("dashboard");loadMembers();}
+
+    function escapeHTML(value) {
+      return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    }
+    function setStatus(id,message,isError=false) {
+      el(id).textContent=message;
+      el(id).style.color=isError?"#a83c36":"#286447";
+    }
+    function setBusy(buttonId,busy,busyText="Please wait...") {
+      const button=el(buttonId);
+      if(busy){button.dataset.originalText=button.textContent;button.textContent=busyText;button.disabled=true;}
+      else{button.textContent=button.dataset.originalText||button.textContent;button.disabled=false;}
+    }
+    function checkClient() {
+      if(!window.familyTreeSupabase) throw new Error("Supabase client not found. Please check supabase.js and the script tags.");
+      return window.familyTreeSupabase;
+    }
+
+    async function loginAdmin(event) {
+      event.preventDefault();setStatus("loginStatus","");setBusy("loginBtn",true,"Signing in...");
+      try {
+        const supabase=checkClient();
+        const {data,error}=await supabase.auth.signInWithPassword({
+          email:el("loginEmail").value.trim(),password:el("loginPassword").value
+        });
+        if(error)throw error;
+        if(!window.FAMILY_TREE_ADMIN_UID||data.user.id!==window.FAMILY_TREE_ADMIN_UID){
+          await supabase.auth.signOut();throw new Error("This account is not the configured administrator account.");
+        }
+        el("loginPassword").value="";setStatus("loginStatus","");showDashboard();
+      } catch(error){setStatus("loginStatus",error.message||"Login failed.",true);}
+      finally{setBusy("loginBtn",false);}
+    }
+    el("loginForm").addEventListener("submit",loginAdmin);
+
+    async function logOut() {
+      try {
+        const supabase=checkClient();const {error}=await supabase.auth.signOut();if(error)throw error;
+        members=[];hideAddForm();showWelcome();
+      } catch(error){setStatus("dashboardStatus",error.message||"Could not log out.",true);}
+    }
+
+ async function loadMembers() {
+  setStatus("dashboardStatus", "Loading family members...");
+
+  try {
+    const supabase = checkClient();
+
+    const { data, error } = await supabase
+      .from("family_members")
+      .select("id, full_name, urdu_name, gender, birth_date, death_date, father_id, mother_id, father_name_text, mother_name_text, cnic_number, photo_url, created_at, education, occupation, spouse_name, marriage_date, biography")
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    members = data || [];
+    updateFamilyStatistics();
+    fillParentOptions();
+    renderTree();
+
+    setStatus("dashboardStatus", "");
+  } catch (error) {
+    setStatus(
+      "dashboardStatus",
+      "Could not load family members: " + (error.message || "Unknown error"),
+      true
+    );
+  }
+}
+    function fillParentOptions() {
+      const fatherSelect=el("father"),motherSelect=el("mother");
+      const oldFather=fatherSelect.value,oldMother=motherSelect.value;
+      fatherSelect.innerHTML='<option value="">'+escapeHTML(t("notSelected"))+'</option>';
+      motherSelect.innerHTML='<option value="">'+escapeHTML(t("notSelected"))+'</option>';
+      members.forEach(member => {
+        if(member.id===editingMemberId)return;
+        const optionText=member.full_name+(member.urdu_name?" — "+member.urdu_name:"");
+        const f=document.createElement("option");f.value=member.id;f.textContent=optionText;fatherSelect.appendChild(f);
+        const m=document.createElement("option");m.value=member.id;m.textContent=optionText;motherSelect.appendChild(m);
+      });
+      if([...fatherSelect.options].some(o=>o.value===oldFather))fatherSelect.value=oldFather;
+      if([...motherSelect.options].some(o=>o.value===oldMother))motherSelect.value=oldMother;
+    }
+
+    function formatDate(dateString) {
+      if(!dateString)return t("unknown");
+      const date=new Date(dateString+"T00:00:00");
+      if(Number.isNaN(date.getTime()))return dateString;
+      return date.toLocaleDateString(isUrdu?"ur-PK":"en-GB");
+    }
+    function memberName(id) {
+      const person=members.find(member=>member.id===id);
+      return person?person.full_name:t("unknown");
+    }
+
+    async function setPrivatePhoto(img,photoPath) {
+      try {
+        const supabase=checkClient();
+        const {data,error}=await supabase.storage.from("Family Photo").createSignedUrl(photoPath,3600);
+        if(error)throw error;
+        if(img.isConnected&&data?.signedUrl){img.src=data.signedUrl;img.classList.remove("hidden");}
+      } catch(error) {
+        console.warn("Could not display private family photo:",error.message||error);
+      }
+    }
+
+   function updateFamilyStatistics() {
+  const total = members.length;
+  const deceased = members.filter(member => member.death_date).length;
+  const alive = total - deceased;
+
+  const totalElement = document.getElementById("statsTotal");
+  const aliveElement = document.getElementById("statsAlive");
+  const deceasedElement = document.getElementById("statsDeceased");
+  const generationsElement = document.getElementById("statsGenerations");
+  const generationContainer = document.getElementById("generationStatistics");
+
+  if (!totalElement || !aliveElement || !deceasedElement ||
+      !generationsElement || !generationContainer) {
+    return;
+  }
+
+  totalElement.textContent = total;
+  aliveElement.textContent = alive;
+  deceasedElement.textContent = deceased;
+
+  // Har member ki generation calculate karein
+  const memberMap = new Map(
+    members.map(member => [String(member.id), member])
+  );
+  const generationMap = new Map();
+  const visiting = new Set();
+
+  function getGeneration(member) {
+    const id = String(member.id);
+
+    if (generationMap.has(id)) {
+      return generationMap.get(id);
+    }
+
+    // Circular parent records se bachao
+    if (visiting.has(id)) {
+      return 0;
+    }
+
+    visiting.add(id);
+
+    const parentIds = [member.father_id, member.mother_id]
+      .filter(parentId =>
+        parentId != null &&
+        parentId !== "" &&
+        memberMap.has(String(parentId))
+      )
+      .map(String);
+
+    let generation = 0;
+
+    if (parentIds.length > 0) {
+      const parentGenerations = parentIds.map(parentId =>
+        getGeneration(memberMap.get(parentId))
+      );
+
+      generation = Math.max(...parentGenerations) + 1;
+    }
+
+    visiting.delete(id);
+    generationMap.set(id, generation);
+
+    return generation;
+  }
+
+  members.forEach(member => getGeneration(member));
+
+  // Generation-wise counting
+  const statsByGeneration = new Map();
+
+  members.forEach(member => {
+    const generation = generationMap.get(String(member.id)) ?? 0;
+
+    if (!statsByGeneration.has(generation)) {
+      statsByGeneration.set(generation, {
+        total: 0,
+        alive: 0,
+        deceased: 0
+      });
+    }
+
+    const stats = statsByGeneration.get(generation);
+    stats.total++;
+
+    if (member.death_date) {
+      stats.deceased++;
+    } else {
+      stats.alive++;
+    }
+  });
+
+  const generationNumbers = [...statsByGeneration.keys()]
+    .sort((a, b) => a - b);
+
+  generationsElement.textContent = generationNumbers.length;
+  generationContainer.innerHTML = "";
+
+  generationNumbers.forEach((generationNumber, index) => {
+    const stats = statsByGeneration.get(generationNumber);
+    const alivePercent = stats.total
+      ? (stats.alive / stats.total) * 100
+      : 0;
+    const deceasedPercent = stats.total
+      ? (stats.deceased / stats.total) * 100
+      : 0;
+
+    const row = document.createElement("div");
+    row.className = "generation-stat-row";
+
+    const heading = document.createElement("div");
+    heading.className = "generation-stat-heading";
+
+    const title = document.createElement("span");
+    title.textContent = "Generation " + (index + 1);
+
+    const count = document.createElement("span");
+    count.textContent = "Total: " + stats.total;
+
+    heading.append(title, count);
+
+    const details = document.createElement("div");
+    details.className = "generation-stat-details";
+
+    const aliveText = document.createElement("span");
+    aliveText.className = "alive-count";
+    aliveText.textContent =
+      "Alive: " + stats.alive + " (" + alivePercent.toFixed(1) + "%)";
+
+    const deceasedText = document.createElement("span");
+    deceasedText.className = "deceased-count";
+    deceasedText.textContent =
+      "Deceased: " + stats.deceased +
+      " (" + deceasedPercent.toFixed(1) + "%)";
+
+    details.append(aliveText, deceasedText);
+
+    const bar = document.createElement("div");
+    bar.className = "generation-stat-bar";
+
+    const aliveBar = document.createElement("div");
+    aliveBar.className = "alive-bar";
+    aliveBar.style.width = alivePercent + "%";
+
+    const deceasedBar = document.createElement("div");
+    deceasedBar.className = "deceased-bar";
+    deceasedBar.style.width = deceasedPercent + "%";
+
+    bar.append(aliveBar, deceasedBar);
+    row.append(heading, details, bar);
+    generationContainer.appendChild(row);
+  });
+}
+
+
+
+async function printMemberProfile(memberId) {
+  const member = members.find(
+    item => String(item.id) === String(memberId)
+  );
+
+  if (!member) {
+    alert("Family member not found.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    alert("Please allow pop-ups and try again.");
+    return;
+  }
+
+  const escapeHTML = value =>
+    String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  const display = value =>
+    value ? escapeHTML(value) : "—";
+
+  const date = value =>
+    value ? escapeHTML(formatDate(value)) : "—";
+
+  const parentName = id => {
+    if (!id) return "—";
+    const parent = members.find(
+      item => String(item.id) === String(id)
+    );
+    return parent ? display(parent.full_name) : "—";
+  };
+
+  const children = members.filter(item =>
+    String(item.father_id || "") === String(member.id) ||
+    String(item.mother_id || "") === String(member.id)
+  );
+
+  const childList = children.length
+    ? children.map(child =>
+        `<li>${display(child.full_name)}${
+          child.urdu_name
+            ? ` — ${display(child.urdu_name)}`
+            : ""
+        }</li>`
+      ).join("")
+    : "<li>—</li>";
+
+  let photoHTML = "";
+
+  if (member.photo_url) {
+    try {
+      const client = checkClient();
+      const { data, error } = await client.storage
+        .from("Family Photo")
+        .createSignedUrl(member.photo_url, 3600);
+
+      if (!error && data?.signedUrl) {
+        photoHTML = `<img class="photo"
+          src="${escapeHTML(data.signedUrl)}"
+          alt="Family member photo">`;
+      }
+    } catch (error) {
+      console.warn("Could not load print photo:", error);
+    }
+  }
+
+  const spouse = member.spouse_name ||
+    members.find(item =>
+      String(item.id) !== String(member.id) &&
+      (
+        (item.full_name || "").trim().toLowerCase() ===
+          (member.spouse_name || "").trim().toLowerCase() ||
+        (item.spouse_name || "").trim().toLowerCase() ===
+          (member.full_name || "").trim().toLowerCase()
+      )
+    )?.full_name || "";
+
+  const status = member.death_date ? "Deceased" : "Alive";
+
+  printWindow.document.open();
+  printWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Family Member Record - ${display(member.full_name)}</title>
+<style>
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #17243a;
+    line-height: 1.45;
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    position: relative;
+    min-height: 275mm;
+    padding: 7mm;
+    border: 2px solid #d9bd7a;
+    background: white;
+    overflow: hidden;
+  }
+
+  .tree-watermark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .10;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .tree-watermark svg {
+    width: 95%;
+    max-height: 245mm;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  header {
+    text-align: center;
+    padding: 16px 10px;
+    background: #10294b;
+    color: white;
+    border-bottom: 4px solid #d9bd7a;
+    border-radius: 5px;
+  }
+
+  header h1 {
+    margin: 0 0 5px;
+    color: white;
+    font-size: 24px;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: #f4e5b7;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  .profile-head {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 18px;
+    margin: 18px 0;
+    padding: 13px;
+    background: rgba(231,237,245,.92);
+    border-left: 4px solid #d9bd7a;
+    border-radius: 6px;
+    break-inside: avoid;
+  }
+
+  .photo {
+    width: 108px;
+    height: 128px;
+    object-fit: cover;
+    border: 2px solid #d9bd7a;
+    border-radius: 7px;
+    flex-shrink: 0;
+  }
+
+  .identity { flex: 1; min-width: 0; }
+
+  .name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #10294b;
+    overflow-wrap: anywhere;
+  }
+
+  .urdu {
+    margin-top: 5px;
+    font-size: 19px;
+    color: #344c6a;
+    overflow-wrap: anywhere;
+  }
+
+  .status {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 10px;
+    border: 1px solid #d9bd7a;
+    border-radius: 20px;
+    color: #7b673a;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  h2 {
+    margin: 15px 0 8px;
+    padding: 7px 9px;
+    color: white;
+    background: #10294b;
+    border-left: 4px solid #d9bd7a;
+    font-size: 14px;
+    break-after: avoid;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+  }
+
+  .row {
+    padding: 7px 8px;
+    background: rgba(231,237,245,.92);
+    border-bottom: 1px solid #d7e0eb;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    break-inside: avoid;
+  }
+
+  .label { color: #10294b; font-weight: bold; }
+
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 4px 0; font-size: 11px; overflow-wrap: anywhere; }
+
+  .bio {
+    min-height: 40px;
+    padding: 10px;
+    background: rgba(231,237,245,.92);
+    border-left: 3px solid #d9bd7a;
+    font-size: 11px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  footer {
+    margin-top: 18px;
+    padding-top: 8px;
+    border-top: 2px solid #d9bd7a;
+    text-align: center;
+    color: #52657b;
+    font-size: 9px;
+  }
+
+  .no-print { margin: 16px 0; text-align: center; }
+
+  .no-print button {
+    padding: 10px 22px;
+    color: white;
+    background: #10294b;
+    border: 1px solid #d9bd7a;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  @media print {
+    .no-print { display: none !important; }
+    .page { min-height: 0; overflow: visible; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="tree-watermark" aria-hidden="true">
+<svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="treeGold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F5E2AC"/>
+    <stop offset="50%" stop-color="#D9BD7A"/>
+    <stop offset="100%" stop-color="#A98545"/>
+  </linearGradient>
+  <radialGradient id="treeLight">
+    <stop offset="0%" stop-color="#D9BD7A" stop-opacity=".3"/>
+    <stop offset="100%" stop-color="#D9BD7A" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<circle cx="250" cy="290" r="210" fill="url(#treeLight)"/>
+<g fill="none" stroke="url(#treeGold)" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M250 535 C246 450 260 380 250 300 C240 230 250 165 250 105" stroke-width="7"/>
+  <path d="M250 400 C205 365 165 320 135 260 M252 350 C300 315 335 270 360 220 M250 290 C210 260 185 215 175 175 M251 235 C280 205 300 170 310 130 M230 440 C190 420 155 390 125 350 M260 430 C305 400 345 370 375 330" stroke-width="4"/>
+  <path d="M135 260 L105 235 M135 260 L145 220 M175 175 L150 145 M175 175 L195 145 M360 220 L385 190 M360 220 L350 180 M310 130 L290 105 M310 130 L335 110 M125 350 L95 330 M125 350 L130 320 M375 330 L400 305 M375 330 L370 300" stroke-width="2.5"/>
+</g>
+<g fill="url(#treeGold)">
+  <ellipse cx="105" cy="225" rx="9" ry="17" transform="rotate(-38 105 225)"/>
+  <ellipse cx="145" cy="213" rx="8" ry="16" transform="rotate(25 145 213)"/>
+  <ellipse cx="150" cy="138" rx="8" ry="15" transform="rotate(-35 150 138)"/>
+  <ellipse cx="198" cy="138" rx="8" ry="15" transform="rotate(35 198 138)"/>
+  <ellipse cx="385" cy="184" rx="9" ry="16" transform="rotate(40 385 184)"/>
+  <ellipse cx="350" cy="172" rx="8" ry="15" transform="rotate(-25 350 172)"/>
+  <ellipse cx="288" cy="99" rx="8" ry="15" transform="rotate(-35 288 99)"/>
+  <ellipse cx="337" cy="104" rx="8" ry="15" transform="rotate(40 337 104)"/>
+  <ellipse cx="95" cy="325" rx="8" ry="15" transform="rotate(-35 95 325)"/>
+  <ellipse cx="130" cy="315" rx="8" ry="15" transform="rotate(25 130 315)"/>
+  <ellipse cx="402" cy="300" rx="8" ry="15" transform="rotate(40 402 300)"/>
+  <ellipse cx="370" cy="294" rx="8" ry="15" transform="rotate(-25 370 294)"/>
+  <circle cx="250" cy="105" r="5"/>
+  <circle cx="135" cy="260" r="4"/>
+  <circle cx="360" cy="220" r="4"/>
+</g>
+</svg>
+</div>
+
+<div class="content">
+<header>
+  <h1>Khandani Shajra</h1>
+  <p class="subtitle">FAMILY MEMBER RECORD</p>
+</header>
+
+<div class="profile-head">
+  ${photoHTML}
+  <div class="identity">
+    <div class="name">${display(member.full_name)}</div>
+    ${member.urdu_name
+      ? `<div class="urdu" dir="auto">${display(member.urdu_name)}</div>`
+      : ""}
+    <div class="status">${status}</div>
+  </div>
+</div>
+
+
+<h2>Personal Information</h2>
+<div class="info-grid">
+  <div class="row"><span class="label">CNIC Number:</span> ${display(member.cnic_number)}</div>
+  <div class="row"><span class="label">Gender:</span> ${display(member.gender)}</div>
+  <div class="row"><span class="label">Date of Birth:</span> ${date(member.birth_date)}</div>
+  <div class="row"><span class="label">Date of Death:</span> ${date(member.death_date)}</div>
+  <div class="row"><span class="label">Education:</span> ${display(member.education)}</div>
+  <div class="row"><span class="label">Occupation:</span> ${display(member.occupation)}</div>
+</div>
+
+
+<h2>Marriage and Family Relationships</h2>
+<div class="info-grid">
+  <div class="row"><span class="label">Father:</span> ${parentName(member.father_id)}</div>
+  <div class="row"><span class="label">Mother:</span> ${parentName(member.mother_id)}</div>
+  <div class="row"><span class="label">Father's Name (Additional):</span> ${display(member.father_name_text)}</div>
+  <div class="row"><span class="label">Mother's Name (Additional):</span> ${display(member.mother_name_text)}</div>
+  <div class="row"><span class="label">Spouse:</span> ${display(spouse)}</div>
+  <div class="row"><span class="label">Marriage Date:</span> ${date(member.marriage_date)}</div>
+</div>
+
+<h2>Children</h2>
+<ul>${childList}</ul>
+
+<h2>Biography</h2>
+<div class="bio">${display(member.biography)}</div>
+
+<footer>Family Heritage · Personal Record</footer>
+</div>
+</div>
+
+<div class="no-print">
+  <button onclick="window.print()">Print / Save as PDF</button>
+</div>
+</body>
+</html>`);
+
+  printWindow.document.close();
+
+  printWindow.onload = () => {
+    const images = Array.from(printWindow.document.images);
+
+    Promise.all(images.map(img => {
+      if (img.complete) return Promise.resolve();
+
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })).then(() => {
+      printWindow.focus();
+      printWindow.print();
+    });
+  };
+}
+
+
+function renderTree() {
+  
+  const rootGrandfather = members.find(
+    member => (member.full_name || "").trim() === "Bashir Ahmad"
+  );
+
+  const rootGrandmother = members.find(
+    member => (member.full_name || "").trim() === "Anwar Begum"
+  );
+
+  const container = el("treeContent");
+  container.innerHTML = "";
+
+  el("memberCount").textContent =
+    members.length + " " +
+    (members.length === 1 ? t("member") : t("members"));
+
+  if (!members.length) {
+    const msg = document.createElement("p");
+    msg.className = "muted";
+    msg.textContent = t("noMembers");
+    container.appendChild(msg);
+    return;
+  }
+
+  // Members ko ID se dhoondhne ke liye
+  const memberMap = new Map(
+    members.map(member => [String(member.id), member])
+  );
+
+let visibleMembers;
+
+if (currentFamilyMemberId === null) {
+  visibleMembers = members.filter(member =>
+    (rootGrandfather &&
+      String(member.id) === String(rootGrandfather.id)) ||
+    (rootGrandmother &&
+      String(member.id) === String(rootGrandmother.id)) ||
+    (rootGrandfather &&
+      String(member.father_id || "") === String(rootGrandfather.id)) ||
+    (rootGrandmother &&
+      String(member.mother_id || "") === String(rootGrandmother.id))
+  );
+} else {
+  const selectedMember = members.find(
+    member => String(member.id) === String(currentFamilyMemberId)
+  );
+
+  const spouse = selectedMember
+    ? members.find(member =>
+        String(member.id) !== String(selectedMember.id) &&
+        (
+          (selectedMember.spouse_name || "").trim().toLowerCase() ===
+            (member.full_name || "").trim().toLowerCase() ||
+          (member.spouse_name || "").trim().toLowerCase() ===
+            (selectedMember.full_name || "").trim().toLowerCase()
+        )
+      )
+    : null;
+
+  visibleMembers = members.filter(member =>
+    String(member.id) === String(currentFamilyMemberId) ||
+    (spouse && String(member.id) === String(spouse.id)) ||
+    String(member.father_id || "") === String(currentFamilyMemberId) ||
+    String(member.mother_id || "") === String(currentFamilyMemberId)
+  );
+}
+
+  const generations = new Map();
+  const assigned = new Set();
+
+  // Jin members ke parents record mein nahi, woh pehli generation hain
+  visibleMembers.forEach(member => {
+    const hasFather = member.father_id &&
+  visibleMembers.some(person =>
+    String(person.id) === String(member.father_id)
+  );
+
+const hasMother = member.mother_id &&
+  visibleMembers.some(person =>
+    String(person.id) === String(member.mother_id)
+  );
+
+    if (!hasFather && !hasMother) {
+      generations.set(String(member.id), 0);
+      assigned.add(String(member.id));
+    }
+  });
+
+  // Parents ki generation ke mutabiq bachon ki generation tay karo
+  let changed = true;
+  let attempts = 0;
+
+  while (changed && attempts < members.length + 1) {
+    changed = false;
+    attempts++;
+
+    visibleMembers.forEach(member => {
+      const id = String(member.id);
+      if (assigned.has(id)) return;
+
+      const parentIds = [member.father_id, member.mother_id]
+        .filter(parentId =>
+          parentId && memberMap.has(String(parentId))
+        )
+        .map(String);
+
+      if (!parentIds.length) {
+        generations.set(id, 0);
+        assigned.add(id);
+        changed = true;
+        return;
+      }
+
+      if (parentIds.every(parentId => assigned.has(parentId))) {
+        const parentGeneration = Math.max(
+          ...parentIds.map(parentId => generations.get(parentId))
+        );
+
+        generations.set(id, parentGeneration + 1);
+        assigned.add(id);
+        changed = true;
+      }
+    });
+  }
+
+  // Circular ya incomplete records ko display se na chhupao
+  members.forEach(member => {
+    const id = String(member.id);
+    if (!assigned.has(id)) {
+      generations.set(id, 0);
+      assigned.add(id);
+    }
+  });
+
+  const generationNumbers = [...new Set(generations.values())]
+    .sort((a, b) => a - b);
+
+  generationNumbers.forEach((generationNumber, index) => {
+    const row = document.createElement("div");
+    row.className = "generation-block";
+
+    const label = document.createElement("div");
+    label.className = "generation-label";
+    label.textContent = isUrdu
+      ? "نسل " + (index + 1)
+      : "Generation " + (index + 1);
+    row.appendChild(label);
+
+    const cardsRow = document.createElement("div");
+    cardsRow.className = "generation-row";
+
+    visibleMembers
+  .filter(member =>
+    generations.get(String(member.id)) === generationNumber
+  )
+  .forEach(member => {
+        const card = document.createElement("article");
+        card.className = "member-card";
+
+card.style.cursor = "pointer";
+card.title = isUrdu
+  ? "تفصیلات دیکھنے کے لیے کلک کریں"
+  : "Click to view profile";
+card.addEventListener("click", (event) => {
+  if (event.target.closest("button")) return;
+  openFamilyView(member.id);
+});
+
+        if (member.photo_url) {
+          const img = document.createElement("img");
+          img.className = "member-photo hidden";
+          img.alt = (member.full_name || "Member") + " photo";
+
+          const placeholder = document.createElement("div");
+          placeholder.className = "photo-placeholder";
+          placeholder.textContent = t("noPhoto");
+
+          card.appendChild(placeholder);
+          card.appendChild(img);
+
+          setPrivatePhoto(img, member.photo_url).then(() => {
+            if (!img.classList.contains("hidden")) {
+              placeholder.remove();
+            }
+          });
+        } else {
+          const placeholder = document.createElement("div");
+          placeholder.className = "photo-placeholder";
+          placeholder.textContent = t("noPhoto");
+          card.appendChild(placeholder);
+        }
+
+        const name = document.createElement("h3");
+        name.textContent = member.full_name || t("unknown");
+        card.appendChild(name);
+        
+        if (member.urdu_name) {
+          const urdu = document.createElement("p");
+          urdu.className = "urdu-name";
+          urdu.textContent = member.urdu_name;
+          card.appendChild(urdu);
+        }
+
+
+const status = document.createElement("p");
+status.className = "member-status";
+
+if (member.death_date) {
+  status.classList.add("status-deceased");
+  status.textContent = isUrdu ? "وفات پا چکے" : "Deceased";
+} else {
+  status.classList.add("status-alive");
+  status.textContent = isUrdu ? "حیات" : "Alive";
+}
+
+card.appendChild(status);
+        const details = document.createElement("div");
+        details.className = "member-details";
+
+        const genderLabel = member.gender
+          ? (isUrdu
+              ? (member.gender === "Male"
+                  ? t("male")
+                  : member.gender === "Female"
+                    ? t("female")
+                    : t("other"))
+              : member.gender)
+          : t("unknown");
+
+        details.textContent =
+          t("gender") + ": " + genderLabel + "\n" +
+          t("born") + ": " + formatDate(member.birth_date) + "\n" +
+          t("father") + ": " + memberName(member.father_id) + "\n" +
+          t("mother") + ": " + memberName(member.mother_id);
+
+        details.style.whiteSpace = "pre-line";
+        card.appendChild(details);
+
+        const actions = document.createElement("div");
+        actions.className = "member-actions";
+
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "gold";
+        edit.textContent = t("editBtn");
+        edit.addEventListener("click", () => editMember(member.id));
+
+        actions.appendChild(edit);
+        
+const printBtn = document.createElement("button");
+printBtn.type = "button";
+printBtn.className = "gold";
+printBtn.textContent = isUrdu ? "پرنٹ" : "Print";
+printBtn.addEventListener("click", (event) => {
+  event.stopPropagation();
+  printMemberProfile(member.id);
+});
+actions.appendChild(printBtn);
+
+        const del = document.createElement("button");
+del.textContent = isUrdu ? "حذف کریں" : "Delete";
+del.className = "delete-btn";
+
+del.addEventListener("click", async () => {
+  const confirmed = confirm(
+    isUrdu
+      ? "Kya aap waqai is member ko delete karna chahte hain?"
+      : "Are you sure you want to delete this family member?"
+  );
+
+  if (!confirmed) return;
+
+ const client = checkClient();
+
+const { error } = await client
+  .from("family_members")
+  .delete()
+  .eq("id", member.id);
+  if (error) {
+    alert("Delete failed: " + error.message);
+    return;
+  }
+
+  await loadMembers();
+});
+
+actions.appendChild(del);
+        card.appendChild(actions);
+        cardsRow.appendChild(card);
+      });
+
+    row.appendChild(cardsRow);
+    container.appendChild(row);
+  });
+}
+function openFamilyView(memberId) {
+  familyNavigationHistory.push(currentFamilyMemberId);
+  currentFamilyMemberId = memberId;
+
+  el("profilePanel").classList.add("hidden");
+  el("treeContent").closest("section").classList.remove("hidden");
+
+  el("familyViewTitle").textContent =
+    members.find(member =>
+      String(member.id) === String(memberId)
+    )?.full_name || "Family";
+
+  el("familyBackBtn").classList.remove("hidden");
+
+  renderTree();
+
+  el("treeContent").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+function openMemberProfile(memberId) {
+  const member = members.find(
+    person => String(person.id) === String(memberId)
+  );
+
+  if (!member) {
+    setStatus(
+      "dashboardStatus",
+      "This family member could not be found.",
+      true
+    );
+    return;
+  }
+
+  const setText = (id, value) => {
+    el(id).textContent = value || "—";
+  };
+
+  setText("profileName", member.full_name);
+  setText("profileUrduName", member.urdu_name);
+  setText("profileCnic", member.cnic_number);
+  setText("profileGender", member.gender);
+  setText("profileBirthDate", formatDate(member.birth_date));
+  setText("profileDeathDate", formatDate(member.death_date));
+  setText("profileEducation", member.education);
+  setText("profileOccupation", member.occupation);
+  setText("profileSpouse", member.spouse_name);
+  setText("profileMarriageDate", formatDate(member.marriage_date));
+  setText("profileFather", memberName(member.father_id));
+  setText("profileMother", memberName(member.mother_id));
+  setText("profileFatherText", member.father_name_text);
+setText("profileMotherText", member.mother_name_text);
+  setText("profileBiography", member.biography);
+
+  const status = el("profileStatus");
+  status.className = "member-status";
+
+  if (member.death_date) {
+    status.textContent = isUrdu ? "وفات پا چکے" : "Deceased";
+    status.classList.add("status-deceased");
+  } else {
+    status.textContent = isUrdu ? "حیات" : "Alive";
+    status.classList.add("status-alive");
+  }
+
+  const photo = el("profilePhoto");
+  photo.classList.add("hidden");
+  photo.removeAttribute("src");
+
+  if (member.photo_url) {
+    setPrivatePhoto(photo, member.photo_url).catch(error => {
+      console.error("Could not load profile photo:", error);
+      photo.classList.add("hidden");
+    });
+  }
+
+  const childrenList = el("profileChildren");
+  childrenList.innerHTML = "";
+
+  const children = members.filter(person =>
+    String(person.father_id || "") === String(member.id) ||
+    String(person.mother_id || "") === String(member.id)
+  );
+
+  if (children.length === 0) {
+    const item = document.createElement("li");
+    item.textContent = "No children added";
+    childrenList.appendChild(item);
+  } else {
+    children.forEach(child => {
+      const item = document.createElement("li");
+      const link = document.createElement("button");
+
+      link.type = "button";
+      link.className = "secondary";
+      link.textContent = child.full_name || "Unknown";
+
+      link.addEventListener("click", () => {
+        openMemberProfile(child.id);
+      });
+
+      item.appendChild(link);
+      childrenList.appendChild(item);
+    });
+  }
+
+  const treeSection = el("treeContent").closest("section");
+  treeSection.classList.add("hidden");
+  el("profilePanel").classList.remove("hidden");
+  el("profilePanel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+el("familyBackBtn").addEventListener("click", () => {
+  if (familyNavigationHistory.length === 0) {
+    currentFamilyMemberId = null;
+  } else {
+    currentFamilyMemberId = familyNavigationHistory.pop();
+  }
+
+  renderTree();
+
+  el("familyViewTitle").textContent =
+    currentFamilyMemberId === null
+      ? "Main Family"
+      : (
+          members.find(member =>
+            String(member.id) === String(currentFamilyMemberId)
+          )?.full_name || "Family"
+        );
+
+  el("familyBackBtn").classList.toggle(
+    "hidden",
+    currentFamilyMemberId === null
+  );
+});
+el("backToTreeBtn").addEventListener("click", () => {
+  el("profilePanel").classList.add("hidden");
+  el("treeContent").closest("section").classList.remove("hidden");
+  el("treeContent").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+});
+
+
+    function clearPhotoPreview() {
+      if(previewObjectUrl){URL.revokeObjectURL(previewObjectUrl);previewObjectUrl=null;}
+      el("photoPreview").src="";el("photoPreview").classList.add("hidden");
+    }
+    el("memberPhoto").addEventListener("change",()=>{
+      clearPhotoPreview();
+      const file=el("memberPhoto").files[0];
+      if(!file)return;
+      const allowed=["image/jpeg","image/png","image/webp"];
+      if(!allowed.includes(file.type)){setStatus("formStatus","Please choose a JPG, PNG or WebP image.",true);el("memberPhoto").value="";return;}
+      if(file.size>5*1024*1024){setStatus("formStatus","Photo must be 5 MB or smaller.",true);el("memberPhoto").value="";return;}
+      previewObjectUrl=URL.createObjectURL(file);el("photoPreview").src=previewObjectUrl;el("photoPreview").classList.remove("hidden");
+      setStatus("formStatus","");
+    });
+
+    function startAddMember() {
+      editingMemberId=null;el("memberForm").reset();clearPhotoPreview();fillParentOptions();
+      el("formTitle").textContent=t("formTitleAdd");el("saveMemberBtn").textContent=t("saveBtn");setStatus("formStatus","");
+      el("addPanel").classList.remove("hidden");el("addPanel").scrollIntoView({behavior:"smooth",block:"start"});
+    }
+
+    function editMember(id) {
+      const member=members.find(person=>person.id===id);
+      if(!member){setStatus("dashboardStatus","This family member could not be found.",true);return;}
+      editingMemberId=id;el("fullName").value=member.full_name||"";el("urduName").value=member.urdu_name||"";
+      el("gender").value=member.gender||"";el("birthDate").value=member.birth_date||"";
+      el("deathDate").value=member.death_date||"";
+      el("fatherNameText").value=member.father_name_text||"";
+el("motherNameText").value=member.mother_name_text||"";
+el("cnicNumber").value = member.cnic_number || "";
+      el("education").value=member.education||"";
+      el("occupation").value=member.occupation||"";
+      el("spouseName").value=member.spouse_name||"";
+      el("marriageDate").value=member.marriage_date||"";
+      el("biography").value=member.biography||"";
+
+      el("memberPhoto").value="";clearPhotoPreview();fillParentOptions();
+      el("father").value=member.father_id||"";el("mother").value=member.mother_id||"";
+      el("formTitle").textContent=t("formTitleEdit");el("saveMemberBtn").textContent=t("updateBtn");setStatus("formStatus","");
+      el("addPanel").classList.remove("hidden");el("addPanel").scrollIntoView({behavior:"smooth",block:"start"});
+    }
+
+    function hideAddForm() {
+      el("memberForm").reset();clearPhotoPreview();editingMemberId=null;el("addPanel").classList.add("hidden");
+      el("formTitle").textContent=t("formTitleAdd");el("saveMemberBtn").textContent=t("saveBtn");setStatus("formStatus","");fillParentOptions();
+    }
+
+    async function uploadMemberPhoto(memberId,file) {
+      const supabase=checkClient();
+      const extMap={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
+      if(!file)return null;
+      if(!extMap[file.type])throw new Error("Please choose a JPG, PNG or WebP image.");
+      if(file.size>5*1024*1024)throw new Error("Photo must be 5 MB or smaller.");
+      const path=memberId+"/"+crypto.randomUUID()+"."+extMap[file.type];
+      const {error:uploadError}=await supabase.storage.from("Family Photo").upload(path,file,{
+        contentType:file.type,upsert:false
+      });
+      if(uploadError)throw uploadError;
+      const {error:updateError}=await supabase.from("family_members").update({photo_url:path}).eq("id",memberId);
+      if(updateError)throw updateError;
+      return path;
+    }
+
+    async function saveMember(event) {
+      event.preventDefault();setStatus("formStatus","");
+      const fullName=el("fullName").value.trim();
+      if(!fullName){setStatus("formStatus","Please enter the person's full name.",true);return;}
+      const photoFile=el("memberPhoto").files[0]||null;
+      if(photoFile){
+        if(!["image/jpeg","image/png","image/webp"].includes(photoFile.type)){setStatus("formStatus","Please choose a JPG, PNG or WebP image.",true);return;}
+        if(photoFile.size>5*1024*1024){setStatus("formStatus","Photo must be 5 MB or smaller.",true);return;}
+      }
+      const fatherId=el("father").value||null,motherId=el("mother").value||null;
+      if(fatherId&&fatherId===motherId){setStatus("formStatus","Please select different people for father and mother.",true);return;}
+     
+const record = {
+  full_name: fullName,
+    cnic_number: el("cnicNumber").value.trim() || null,
+  urdu_name: el("urduName").value.trim() || null,
+  gender: el("gender").value || null,
+  birth_date: el("birthDate").value || null,
+  death_date: el("deathDate").value || null,
+  father_id: fatherId,
+  mother_id: motherId,
+  father_name_text: el("fatherNameText").value.trim() || null,
+  mother_name_text: el("motherNameText").value.trim() || null,
+  education: el("education").value.trim() || null,
+  occupation: el("occupation").value.trim() || null,
+  spouse_name: el("spouseName").value.trim() || null,
+  marriage_date: el("marriageDate").value || null,
+  biography: el("biography").value.trim() || null
+};
+
+      setBusy("saveMemberBtn",true,editingMemberId?"Updating...":"Saving...");
+      let savedMemberId=editingMemberId;
+      let memberSaved=false;
+      try {
+        const supabase=checkClient();
+        if(editingMemberId){
+          const {error}=await supabase.from("family_members").update(record).eq("id",editingMemberId);
+          if(error)throw error;
+          memberSaved=true;
+        } else {
+          const {data,error}=await supabase.from("family_members").insert(record).select("id").single();
+          if(error)throw error;
+          savedMemberId=data.id;memberSaved=true;
+        }
+        if(photoFile){
+          try {
+            await uploadMemberPhoto(savedMemberId,photoFile);
+          } catch(photoError) {
+            hideAddForm();
+            await loadMembers();
+            setStatus("dashboardStatus",t("savedPhotoFailed")+" Details: "+(photoError.message||"Unknown upload error"),true);
+            return;
+          }
+        }
+        const wasEditing=Boolean(editingMemberId);
+        hideAddForm();
+        setStatus("dashboardStatus",wasEditing?"Family member updated successfully.":"Family member added successfully.");
+        await loadMembers();
+      } catch(error) {
+        setStatus("formStatus",(editingMemberId?"Could not update person: ":"Could not save person: ")+(error.message||"Unknown error"),true);
+      } finally {
+        setBusy("saveMemberBtn",false);
+        el("saveMemberBtn").textContent=editingMemberId?t("updateBtn"):t("saveBtn");
+      }
+    }
+    el("memberForm").addEventListener("submit",saveMember);
+
+    showWelcome();
+    
+const welcomeSection = document.getElementById("welcome");
+
+if (welcomeSection) {
+  welcomeSection.addEventListener("mousemove", function(event) {
+    const rect = welcomeSection.getBoundingClientRect();
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    welcomeSection.style.setProperty("--mouse-x", x + "px");
+    welcomeSection.style.setProperty("--mouse-y", y + "px");
+  });
+
+  welcomeSection.addEventListener("mouseleave", function() {
+    welcomeSection.style.setProperty("--mouse-x", "50%");
+    welcomeSection.style.setProperty("--mouse-y", "50%");
+  });
+}
+
+  </script>
+</body>
+</html>
