@@ -352,9 +352,27 @@ border: 1px solid #f0d58f;
 }
 
 @media (max-width: 620px) {
+  .family-tree {
+    overflow-x: hidden;
+    padding: 16px 8px 24px;
+  }
+
   .generation-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: flex-start;
     gap: 14px;
+    min-width: 0;
+    width: 100%;
+    padding: 10px 4px;
+  }
+
+  .family-tree .member-card {
+    width: 100%;
+    max-width: 320px;
+    flex: 0 1 auto;
+    box-sizing: border-box;
   }
 }
 
@@ -1384,7 +1402,7 @@ select option:disabled {
         <div class="section-title">
           <div><h2 id="dashboardTitle">Family Dashboard</h2><p class="muted" id="dashboardHelp">Add family members or edit existing records.</p></div>
           <div class="row">
-            <button class="primary" id="addPersonBtn" type="button" onclick="startAddMember()">+ Add Family Member</button>
+            <button class="primary" id="addPersonBtn" type="button" onclick="startAddMember()" data-admin-only>+ Add Family Member</button>
             <button class="secondary" id="refreshBtn" type="button" onclick="loadMembers()">Refresh Tree</button>
             <button class="danger" id="logoutBtn" type="button" onclick="logOut()">Logout</button>
           </div>
@@ -1418,16 +1436,6 @@ select option:disabled {
   <select id="mother">
     <option value="">Not selected</option>
   </select>
-</div>
-
-<div class="field">
-  <label for="fatherNameText">Father's Name (Additional)</label>
-  <input id="fatherNameText" type="text" maxlength="200">
-</div>
-
-<div class="field">
-  <label for="motherNameText">Mother's Name (Additional)</label>
-  <input id="motherNameText" type="text" maxlength="200">
 </div>
 
 <div class="field">
@@ -1529,8 +1537,7 @@ select option:disabled {
     </article>
   </div>
 
-  <h3 class="statistics-subtitle">Generation-wise Record</h3>
-  <div id="generationStatistics"></div>
+
 </section>
 <!-- END FAMILY STATISTICS DASHBOARD -->
 
@@ -1571,9 +1578,7 @@ select option:disabled {
 <h3>Family Relationships</h3>
 <p><strong>Father:</strong> <span id="profileFather"></span></p>
 <p><strong>Mother:</strong> <span id="profileMother"></span></p>
-<p><strong>Father's Name (Additional):</strong> <span id="profileFatherText"></span></p>
-<p><strong>Mother's Name (Additional):</strong> <span id="profileMotherText"></span></p>
-    <p><strong>Children:</strong></p>
+<p><strong>Children:</strong></p>
     <ul id="profileChildren"></ul>
 
     <h3>Biography</h3>
@@ -1600,7 +1605,7 @@ select option:disabled {
       en: {
         siteTitle:"Our Family Tree",siteSubtitle:"Preserving our roots, stories and generations",
         welcomeTitle:"Every Family Has a Story",welcomeText:"Discover your family roots and preserve the names and connections of the generations that came before you.",
-        exploreBtn:"Explore Our Roots",loginTitle:"Administrator Login",loginHelp:"Sign in using the administrator account created in Supabase.",
+        exploreBtn:"Explore Our Roots",loginTitle:"Family Tree Login",loginHelp:"Sign in using your email address and password.",
         emailLabel:"Email address",passwordLabel:"Password",loginBtn:"Login",backBtn:"Back",
         dashboardTitle:"Family Dashboard",dashboardHelp:"Add family members or edit existing records.",
         addPersonBtn:"+ Add Family Member",refreshBtn:"Refresh Tree",logoutBtn:"Logout",
@@ -1670,7 +1675,15 @@ select option:disabled {
     }
     function showWelcome(){showOnly("welcome");}
     function showLogin(){showOnly("login");el("loginStatus").textContent="";}
-    function showDashboard(){showOnly("dashboard");loadMembers();}
+    function showDashboard() {
+  showOnly("dashboard");
+
+  document.querySelectorAll("[data-admin-only]").forEach((item) => {
+    item.hidden = !window.familyTreeIsAdmin;
+  });
+
+  loadMembers();
+}
 
     function escapeHTML(value) {
       return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -1689,22 +1702,45 @@ select option:disabled {
       return window.familyTreeSupabase;
     }
 
-    async function loginAdmin(event) {
-      event.preventDefault();setStatus("loginStatus","");setBusy("loginBtn",true,"Signing in...");
-      try {
-        const supabase=checkClient();
-        const {data,error}=await supabase.auth.signInWithPassword({
-          email:el("loginEmail").value.trim(),password:el("loginPassword").value
-        });
-        if(error)throw error;
-        if(!window.FAMILY_TREE_ADMIN_UID||data.user.id!==window.FAMILY_TREE_ADMIN_UID){
-          await supabase.auth.signOut();throw new Error("This account is not the configured administrator account.");
-        }
-        el("loginPassword").value="";setStatus("loginStatus","");showDashboard();
-      } catch(error){setStatus("loginStatus",error.message||"Login failed.",true);}
-      finally{setBusy("loginBtn",false);}
-    }
-    el("loginForm").addEventListener("submit",loginAdmin);
+   
+async function loginAdmin(event) {
+  event.preventDefault();
+
+  setStatus("loginStatus", "");
+  setBusy("loginBtn", true, "Signing in...");
+
+  try {
+    const supabase = checkClient();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: el("loginEmail").value.trim(),
+      password: el("loginPassword").value
+    });
+
+    if (error) throw error;
+
+    // Identify Admin or Viewer
+    window.familyTreeCurrentUser = data.user;
+    window.familyTreeIsAdmin =
+      data.user.id === window.FAMILY_TREE_ADMIN_UID;
+
+    el("loginPassword").value = "";
+    setStatus("loginStatus", "");
+
+    showDashboard();
+
+  } catch (error) {
+    setStatus(
+      "loginStatus",
+      error.message || "Login failed.",
+      true
+    );
+  } finally {
+    setBusy("loginBtn", false);
+  }
+}
+
+el("loginForm").addEventListener("submit", loginAdmin);
 
     async function logOut() {
       try {
@@ -1713,33 +1749,43 @@ select option:disabled {
       } catch(error){setStatus("dashboardStatus",error.message||"Could not log out.",true);}
     }
 
- async function loadMembers() {
+ 
+async function loadMembers() {
   setStatus("dashboardStatus", "Loading family members...");
 
   try {
     const supabase = checkClient();
 
-    const { data, error } = await supabase
-      .from("family_members")
-      .select("id, full_name, urdu_name, gender, birth_date, death_date, father_id, mother_id, father_name_text, mother_name_text, cnic_number, photo_url, created_at, education, occupation, spouse_name, marriage_date, biography")
-      .order("created_at", { ascending: true });
+    // Admin and Viewer both use the restricted read function.
+    const { data, error } = await supabase.rpc(
+      "get_family_members_for_viewer"
+    );
 
     if (error) throw error;
 
     members = data || [];
+
     updateFamilyStatistics();
-    fillParentOptions();
+
+    // Only Admin needs parent options for editing.
+    if (window.familyTreeIsAdmin) {
+      fillParentOptions();
+    }
+
     renderTree();
 
     setStatus("dashboardStatus", "");
+
   } catch (error) {
     setStatus(
       "dashboardStatus",
-      "Could not load family members: " + (error.message || "Unknown error"),
+      "Could not load family members: " +
+      (error.message || "Unknown error"),
       true
     );
   }
 }
+
     function fillParentOptions() {
       const fatherSelect=el("father"),motherSelect=el("mother");
       const oldFather=fatherSelect.value,oldMother=motherSelect.value;
@@ -1786,12 +1832,11 @@ select option:disabled {
   const aliveElement = document.getElementById("statsAlive");
   const deceasedElement = document.getElementById("statsDeceased");
   const generationsElement = document.getElementById("statsGenerations");
-  const generationContainer = document.getElementById("generationStatistics");
 
   if (!totalElement || !aliveElement || !deceasedElement ||
-      !generationsElement || !generationContainer) {
-    return;
-  }
+    !generationsElement) {
+  return;
+}
 
   totalElement.textContent = total;
   aliveElement.textContent = alive;
@@ -1844,90 +1889,9 @@ select option:disabled {
 
   members.forEach(member => getGeneration(member));
 
-  // Generation-wise counting
-  const statsByGeneration = new Map();
-
-  members.forEach(member => {
-    const generation = generationMap.get(String(member.id)) ?? 0;
-
-    if (!statsByGeneration.has(generation)) {
-      statsByGeneration.set(generation, {
-        total: 0,
-        alive: 0,
-        deceased: 0
-      });
-    }
-
-    const stats = statsByGeneration.get(generation);
-    stats.total++;
-
-    if (member.death_date) {
-      stats.deceased++;
-    } else {
-      stats.alive++;
-    }
-  });
-
-  const generationNumbers = [...statsByGeneration.keys()]
-    .sort((a, b) => a - b);
-
-  generationsElement.textContent = generationNumbers.length;
-  generationContainer.innerHTML = "";
-
-  generationNumbers.forEach((generationNumber, index) => {
-    const stats = statsByGeneration.get(generationNumber);
-    const alivePercent = stats.total
-      ? (stats.alive / stats.total) * 100
-      : 0;
-    const deceasedPercent = stats.total
-      ? (stats.deceased / stats.total) * 100
-      : 0;
-
-    const row = document.createElement("div");
-    row.className = "generation-stat-row";
-
-    const heading = document.createElement("div");
-    heading.className = "generation-stat-heading";
-
-    const title = document.createElement("span");
-    title.textContent = "Generation " + (index + 1);
-
-    const count = document.createElement("span");
-    count.textContent = "Total: " + stats.total;
-
-    heading.append(title, count);
-
-    const details = document.createElement("div");
-    details.className = "generation-stat-details";
-
-    const aliveText = document.createElement("span");
-    aliveText.className = "alive-count";
-    aliveText.textContent =
-      "Alive: " + stats.alive + " (" + alivePercent.toFixed(1) + "%)";
-
-    const deceasedText = document.createElement("span");
-    deceasedText.className = "deceased-count";
-    deceasedText.textContent =
-      "Deceased: " + stats.deceased +
-      " (" + deceasedPercent.toFixed(1) + "%)";
-
-    details.append(aliveText, deceasedText);
-
-    const bar = document.createElement("div");
-    bar.className = "generation-stat-bar";
-
-    const aliveBar = document.createElement("div");
-    aliveBar.className = "alive-bar";
-    aliveBar.style.width = alivePercent + "%";
-
-    const deceasedBar = document.createElement("div");
-    deceasedBar.className = "deceased-bar";
-    deceasedBar.style.width = deceasedPercent + "%";
-
-    bar.append(aliveBar, deceasedBar);
-    row.append(heading, details, bar);
-    generationContainer.appendChild(row);
-  });
+  // Total generations
+  const generationNumbers = new Set(generationMap.values());
+  generationsElement.textContent = generationNumbers.size;
 }
 
 
@@ -2025,16 +1989,23 @@ async function printMemberProfile(memberId) {
 <head>
 <meta charset="UTF-8">
 <title>Family Member Record - ${display(member.full_name)}</title>
+
 <style>
-  @page { size: A4 portrait; margin: 10mm; }
-  * { box-sizing: border-box; }
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    color: #17243a;
-    line-height: 1.45;
-    background: white;
+    color: #24364d;
+    line-height: 1.55;
+    background: #ffffff;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -2042,9 +2013,11 @@ async function printMemberProfile(memberId) {
   .page {
     position: relative;
     min-height: 275mm;
-    padding: 7mm;
-    border: 2px solid #d9bd7a;
-    background: white;
+    padding: 9mm;
+    border: 2px solid #c8a85f;
+    outline: 1px solid #e8d9b5;
+    outline-offset: -6px;
+    background: #ffffff;
     overflow: hidden;
   }
 
@@ -2054,154 +2027,208 @@ async function printMemberProfile(memberId) {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: .10;
+    opacity: .13;
     pointer-events: none;
     z-index: 0;
   }
 
   .tree-watermark svg {
-    width: 95%;
-    max-height: 245mm;
+    width: 100%;
+    max-height: 255mm;
   }
 
-  .content { position: relative; z-index: 1; }
+  .content {
+    position: relative;
+    z-index: 1;
+  }
 
   header {
     text-align: center;
-    padding: 16px 10px;
-    background: #10294b;
-    color: white;
-    border-bottom: 4px solid #d9bd7a;
-    border-radius: 5px;
+    padding: 23px 14px 19px;
+    background: linear-gradient(135deg, #0b1f3a, #183b65);
+    color: #ffffff;
+    border: 1px solid #c8a85f;
+    border-bottom: 5px solid #c8a85f;
+    border-radius: 9px;
   }
 
   header h1 {
-    margin: 0 0 5px;
-    color: white;
-    font-size: 24px;
+    margin: 0 0 7px;
+    color: #ffffff;
+    font-size: 29px;
+    letter-spacing: .5px;
   }
 
   .subtitle {
     margin: 0;
-    color: #f4e5b7;
-    font-size: 11px;
-    letter-spacing: 2px;
+    color: #f3dfaa;
+    font-size: 10px;
+    letter-spacing: 3px;
   }
 
   .profile-head {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    gap: 18px;
-    margin: 18px 0;
-    padding: 13px;
-    background: rgba(231,237,245,.92);
-    border-left: 4px solid #d9bd7a;
-    border-radius: 6px;
+    gap: 22px;
+    margin: 22px 0;
+    padding: 18px;
+    background: rgba(232, 240, 249, .96);
+    border: 1px solid #cbd9e8;
+    border-left: 5px solid #c8a85f;
+    border-radius: 9px;
     break-inside: avoid;
   }
 
   .photo {
-    width: 108px;
-    height: 128px;
+    width: 125px;
+    height: 145px;
     object-fit: cover;
-    border: 2px solid #d9bd7a;
-    border-radius: 7px;
+    border: 3px solid #c8a85f;
+    border-radius: 9px;
+    padding: 3px;
+    background: #ffffff;
     flex-shrink: 0;
   }
 
-  .identity { flex: 1; min-width: 0; }
+  .identity {
+    flex: 1;
+    min-width: 0;
+  }
 
   .name {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: bold;
     color: #10294b;
     overflow-wrap: anywhere;
   }
 
   .urdu {
-    margin-top: 5px;
-    font-size: 19px;
+    margin-top: 8px;
+    font-size: 21px;
     color: #344c6a;
     overflow-wrap: anywhere;
   }
 
   .status {
     display: inline-block;
-    margin-top: 8px;
-    padding: 3px 10px;
-    border: 1px solid #d9bd7a;
-    border-radius: 20px;
-    color: #7b673a;
+    margin-top: 12px;
+    padding: 5px 15px;
+    border: 1px solid #c8a85f;
+    border-radius: 30px;
+    background: #fffaf0;
+    color: #80632c;
     font-size: 11px;
     font-weight: bold;
   }
 
   h2 {
-    margin: 15px 0 8px;
-    padding: 7px 9px;
-    color: white;
+    margin: 20px 0 10px;
+    padding: 10px 13px;
+    color: #ffffff;
     background: #10294b;
-    border-left: 4px solid #d9bd7a;
-    font-size: 14px;
+    border-left: 5px solid #c8a85f;
+    border-radius: 4px;
+    font-size: 15px;
+    letter-spacing: .2px;
     break-after: avoid;
   }
 
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px 10px;
+    gap: 9px 12px;
   }
 
   .row {
-    padding: 7px 8px;
-    background: rgba(231,237,245,.92);
-    border-bottom: 1px solid #d7e0eb;
-    font-size: 11px;
+    padding: 11px 12px;
+    background: rgba(235, 242, 249, .96);
+    border: 1px solid #d8e2ed;
+    border-left: 3px solid #c8a85f;
+    border-radius: 5px;
+    font-size: 12px;
     overflow-wrap: anywhere;
     break-inside: avoid;
   }
 
-  .label { color: #10294b; font-weight: bold; }
+  .label {
+    color: #10294b;
+    font-weight: bold;
+  }
 
-  ul { margin: 6px 0; padding-left: 22px; }
-  li { margin: 4px 0; font-size: 11px; overflow-wrap: anywhere; }
+  ul {
+    margin: 9px 0;
+    padding: 12px 15px 12px 30px;
+    background: rgba(235, 242, 249, .94);
+    border-left: 3px solid #c8a85f;
+    border-radius: 5px;
+  }
+
+  li {
+    margin: 6px 0;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
 
   .bio {
-    min-height: 40px;
-    padding: 10px;
-    background: rgba(231,237,245,.92);
-    border-left: 3px solid #d9bd7a;
-    font-size: 11px;
+    min-height: 55px;
+    padding: 14px;
+    background: rgba(235, 242, 249, .96);
+    border: 1px solid #d8e2ed;
+    border-left: 4px solid #c8a85f;
+    border-radius: 5px;
+    font-size: 12px;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
 
   footer {
-    margin-top: 18px;
-    padding-top: 8px;
-    border-top: 2px solid #d9bd7a;
+    margin-top: 24px;
+    padding: 12px 5px 5px;
+    border-top: 2px solid #c8a85f;
     text-align: center;
     color: #52657b;
-    font-size: 9px;
+    font-size: 10px;
+    letter-spacing: .5px;
   }
 
-  .no-print { margin: 16px 0; text-align: center; }
+  .no-print {
+    margin: 16px 0;
+    text-align: center;
+  }
 
   .no-print button {
     padding: 10px 22px;
     color: white;
     background: #10294b;
-    border: 1px solid #d9bd7a;
+    border: 1px solid #c8a85f;
     border-radius: 6px;
     cursor: pointer;
   }
 
   @media print {
-    .no-print { display: none !important; }
-    .page { min-height: 0; overflow: visible; }
+    .no-print {
+      display: none !important;
+    }
+
+    .page {
+      min-height: 275mm;
+      overflow: hidden;
+    }
+
+    header,
+    h2,
+    .profile-head,
+    .row,
+    .bio,
+    ul {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
   }
+    
 </style>
+
 </head>
 <body>
 <div class="page">
@@ -2278,8 +2305,6 @@ async function printMemberProfile(memberId) {
 <div class="info-grid">
   <div class="row"><span class="label">Father:</span> ${parentName(member.father_id)}</div>
   <div class="row"><span class="label">Mother:</span> ${parentName(member.mother_id)}</div>
-  <div class="row"><span class="label">Father's Name (Additional):</span> ${display(member.father_name_text)}</div>
-  <div class="row"><span class="label">Mother's Name (Additional):</span> ${display(member.mother_name_text)}</div>
   <div class="row"><span class="label">Spouse:</span> ${display(spouse)}</div>
   <div class="row"><span class="label">Marriage Date:</span> ${date(member.marriage_date)}</div>
 </div>
@@ -2447,7 +2472,7 @@ const hasMother = member.mother_id &&
   }
 
   // Circular ya incomplete records ko display se na chhupao
-  members.forEach(member => {
+  visibleMembers.forEach(member => {
     const id = String(member.id);
     if (!assigned.has(id)) {
       generations.set(id, 0);
@@ -2568,7 +2593,9 @@ card.appendChild(status);
         edit.textContent = t("editBtn");
         edit.addEventListener("click", () => editMember(member.id));
 
-        actions.appendChild(edit);
+        if (window.familyTreeIsAdmin) {
+  actions.appendChild(edit);
+}
         
 const printBtn = document.createElement("button");
 printBtn.type = "button";
@@ -2585,6 +2612,10 @@ del.textContent = isUrdu ? "حذف کریں" : "Delete";
 del.className = "delete-btn";
 
 del.addEventListener("click", async () => {
+    if (!window.familyTreeIsAdmin) {
+    alert("Only administrator can delete family members.");
+    return;
+  }
   const confirmed = confirm(
     isUrdu
       ? "Kya aap waqai is member ko delete karna chahte hain?"
@@ -2607,7 +2638,9 @@ const { error } = await client
   await loadMembers();
 });
 
-actions.appendChild(del);
+if (window.familyTreeIsAdmin) {
+  actions.appendChild(del);
+}
         card.appendChild(actions);
         cardsRow.appendChild(card);
       });
@@ -2667,8 +2700,6 @@ function openMemberProfile(memberId) {
   setText("profileMarriageDate", formatDate(member.marriage_date));
   setText("profileFather", memberName(member.father_id));
   setText("profileMother", memberName(member.mother_id));
-  setText("profileFatherText", member.father_name_text);
-setText("profileMotherText", member.mother_name_text);
   setText("profileBiography", member.biography);
 
   const status = el("profileStatus");
@@ -2791,9 +2822,7 @@ el("backToTreeBtn").addEventListener("click", () => {
       editingMemberId=id;el("fullName").value=member.full_name||"";el("urduName").value=member.urdu_name||"";
       el("gender").value=member.gender||"";el("birthDate").value=member.birth_date||"";
       el("deathDate").value=member.death_date||"";
-      el("fatherNameText").value=member.father_name_text||"";
-el("motherNameText").value=member.mother_name_text||"";
-el("cnicNumber").value = member.cnic_number || "";
+      el("cnicNumber").value = member.cnic_number || "";
       el("education").value=member.education||"";
       el("occupation").value=member.occupation||"";
       el("spouseName").value=member.spouse_name||"";
@@ -2812,6 +2841,9 @@ el("cnicNumber").value = member.cnic_number || "";
     }
 
     async function uploadMemberPhoto(memberId,file) {
+            if (!window.familyTreeIsAdmin) {
+        throw new Error("Only administrator can upload photos.");
+      }
       const supabase=checkClient();
       const extMap={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
       if(!file)return null;
@@ -2829,6 +2861,10 @@ el("cnicNumber").value = member.cnic_number || "";
 
     async function saveMember(event) {
       event.preventDefault();setStatus("formStatus","");
+      if (!window.familyTreeIsAdmin) {
+  setStatus("formStatus", "Only administrator can edit family records.", true);
+  return;
+}
       const fullName=el("fullName").value.trim();
       if(!fullName){setStatus("formStatus","Please enter the person's full name.",true);return;}
       const photoFile=el("memberPhoto").files[0]||null;
@@ -2848,8 +2884,6 @@ const record = {
   death_date: el("deathDate").value || null,
   father_id: fatherId,
   mother_id: motherId,
-  father_name_text: el("fatherNameText").value.trim() || null,
-  mother_name_text: el("motherNameText").value.trim() || null,
   education: el("education").value.trim() || null,
   occupation: el("occupation").value.trim() || null,
   spouse_name: el("spouseName").value.trim() || null,
